@@ -1,0 +1,752 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Strategy &amp; GTM · Rekha</title>
+<meta name="description" content="Strategy &amp; GTM: part of Rekha, a product case study on spending limits for AI agents on UPI, by Abhishek Kumar.">
+<meta property="og:title" content="Strategy &amp; GTM · Rekha">
+<meta property="og:image" content="https://whyabhiiiii.github.io/rekha-ai-agent-payments/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%235B3CC4'/%3E%3Cpath d='M12 42C24 26 40 22 52 24' fill='none' stroke='white' stroke-width='6' stroke-linecap='round'/%3E%3Ccircle cx='12' cy='42' r='5' fill='white'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&family=Rozha+One&display=swap">
+<style>
+/* Layout: a single reading column pinned to the same violet margin rule as the case study. */
+:root {
+  --paper: #F6F5FA; --surface: #FFFFFF; --ink: #17162B; --muted: #5D5B73; --faint: #6A6783; --rule: #E2E0EC;
+  --line: #5B3CC4; --line-ink: #4A2FB0; --line-soft: #EEEAFC;
+  --f-display: "Rozha One", "Noto Serif Devanagari", Georgia, serif;
+  --f-body: "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #121120; --surface: #1C1B2C; --ink: #ECEAF6; --muted: #A9A6C0; --faint: #908DA9; --rule: #2D2B42;
+    --line: #A792FF; --line-ink: #C4B6FF; --line-soft: #262046; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #121120; --surface: #1C1B2C; --ink: #ECEAF6; --muted: #A9A6C0; --faint: #908DA9; --rule: #2D2B42;
+  --line: #A792FF; --line-ink: #C4B6FF; --line-soft: #262046; color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 17px/1.65 var(--f-body); }
+a { color: var(--line-ink); text-underline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--line); outline-offset: 2px; }
+.top { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; justify-content: space-between;
+  padding: 14px max(16px, 4vw); border-bottom: 1px solid var(--rule); background: var(--paper); position: sticky; top: env(safe-area-inset-top, 0px); z-index: 2; }
+.mark { display: inline-flex; align-items: baseline; gap: 8px; text-decoration: none; color: var(--ink); }
+.mark .dev { font-family: var(--f-display); font-size: 26px; line-height: 1; border-bottom: 3px solid var(--line); }
+.mark .lat { font-family: var(--f-display); font-size: 18px; }
+.top nav { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 14.5px; font-weight: 600; }
+.top nav a { text-decoration: none; }
+.top nav a:hover { text-decoration: underline; }
+.wrap { max-width: 980px; margin: 0 auto; padding: 32px max(16px, 4vw) 64px; }
+article { border-left: 2px solid var(--line); padding-left: clamp(16px, 4vw, 40px); min-width: 0; }
+article > * { max-width: 72ch; }
+article > .tw, article > pre, article > .mermaid-wrap { max-width: none; }
+h1 { font-family: var(--f-display); font-weight: 400; font-size: clamp(32px, 5vw, 48px); line-height: 1.08; margin: 0 0 18px; text-wrap: balance; }
+h2 { font-family: var(--f-display); font-weight: 400; font-size: clamp(25px, 3.4vw, 32px); line-height: 1.15; margin: 44px 0 12px; text-wrap: balance; }
+h3 { font-size: 19px; margin: 28px 0 8px; }
+h4 { font-size: 16px; margin: 20px 0 6px; }
+p, li { margin: 0 0 12px; }
+ul, ol { padding-left: 22px; margin: 0 0 14px; }
+hr { border: 0; border-top: 1px solid var(--rule); margin: 32px 0; }
+blockquote { margin: 0 0 16px; padding: 10px 16px; border-left: 4px solid var(--line); background: var(--line-soft); border-radius: 0 12px 12px 0; }
+blockquote p:last-child { margin-bottom: 0; }
+code { font-family: var(--f-mono); font-size: .86em; background: var(--line-soft); color: var(--line-ink); padding: 1px 5px; border-radius: 5px; }
+pre { background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; padding: 14px 16px; overflow-x: auto; margin: 0 0 16px; }
+pre code { background: none; color: var(--ink); padding: 0; font-size: 13.5px; line-height: 1.55; }
+.tw { overflow-x: auto; border: 1px solid var(--rule); border-radius: 12px; background: var(--surface); margin: 0 0 18px; }
+table { width: 100%; border-collapse: collapse; font-size: 14.5px; min-width: 560px; }
+th { text-align: left; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; padding: 10px 12px; border-bottom: 1px solid var(--rule); }
+td { padding: 9px 12px; border-top: 1px solid var(--rule); vertical-align: top; }
+tr:first-child td { border-top: 0; }
+.mermaid-wrap { background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; padding: 16px; overflow-x: auto; margin: 0 0 18px; }
+pre.mermaid { border: 0; padding: 0; margin: 0; background: none; overflow: visible; }
+pre.mermaid svg { display: block; margin-inline: auto; }
+/* trees (opportunity tree, metric tree): nested lists drawn with connector lines */
+ul.tree { list-style: none; padding: 14px 16px; margin: 0 0 18px; max-width: none; background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; font-size: 15.5px; }
+ul.tree ul { list-style: none; margin: 8px 0 4px 6px; padding-left: 18px; border-left: 2px solid var(--line-soft); }
+ul.tree li { margin: 0 0 6px; line-height: 1.5; }
+ul.tree > li > ul > li { margin-bottom: 12px; }
+ul.tree em { color: var(--muted); font-size: .93em; }
+.pager { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 48px; padding-top: 18px; border-top: 1px solid var(--rule); font-weight: 600; }
+.foot { margin-top: 24px; font-size: 13.5px; color: var(--faint); }
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="mark" href="../index.html"><span class="dev" lang="hi">रेखा</span><span class="lat">Rekha</span></a>
+  <nav aria-label="Project">
+    <a href="../index.html">Case study</a>
+    <a href="../prototype.html">Prototype</a>
+    <a href="../index.html#docs">All documents</a>
+  </nav>
+</header>
+<main class="wrap">
+<article>
+<h1 id="04-strategy-business-model-and-go-to-market">04 · Strategy, Business Model and Go-to-Market</h1>
+<hr>
+<h2 id="1-vision-mission-strategy">1. Vision, mission, strategy</h2>
+<ul>
+<li><strong>Vision:</strong> every Indian can hand routine spending to AI agents with the same confidence they have in UPI today.</li>
+<li><strong>Mission (3 years):</strong> make the user's side of agent payments as well-built as the merchant's side: clear boundaries, honest explanations, fast recovery.</li>
+<li><strong>Strategy in one sentence:</strong> ship Rekha <em>inside</em> a top UPI app at the moment users link their first agent, win the "agent linking" default in the window before NPCI's Unified Agent Protocol launches, and compound a cross-agent safety advantage nobody on the agent or merchant side can match.</li>
+</ul>
+<hr>
+<h2 id="2-why-now-summary">2. Why now (summary)</h2>
+<ol>
+<li><strong>Agents already pay, and the official launch is waiting on safeguards.</strong> Pine Labs' P3P has let agents pay over UPI after one upfront approval since June 2026, and Razorpay × NPCI run in-chat checkout pilots. NPCI's Unified Agent Protocol, with user-set limits and an agent registry, was reported in September 2026; its launch was then reported paused pending regulatory clearance, with user protection and liability the open questions. Safeguards are the gating item, the consumer-control experience is undefined, and there is still time to shape it.</li>
+<li><strong>The regulator is asking for it.</strong> RBI's April 2026 discussion paper proposes customer-set transaction limits, a kill switch, cooling-off periods and trusted-person approval for vulnerable users.</li>
+<li><strong>Demand exists, trust doesn't.</strong> 100M weekly ChatGPT users in India. 74% of consumers are open to agents doing shopping tasks for them, but only 9% to agents buying on their own.</li>
+<li><strong>The supply side is crowded.</strong> Razorpay, Cashfree, PayU, BharatPe and Visa all shipped agentic tools in Sept 2026. The user's side is empty.</li>
+</ol>
+<hr>
+<h2 id="3-market-sizing">3. Market sizing</h2>
+<p><strong>Unit:</strong> agent-addressable routine consumer spend over UPI, per year. All assumptions are explicit and adjustable in the case-study site's calculator.</p>
+<h3 id="bottom-up">Bottom-up</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Assumption</th>
+<th>Source / rationale</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UPI users</td>
+<td>55.49 crore</td>
+<td>Ministry of Finance (June 2026)</td>
+<td>554.9M</td>
+</tr>
+<tr>
+<td>Open to an agent deciding what to buy while they make the payment</td>
+<td>32%</td>
+<td>Accenture 2026 (global; applying it to India is an assumption to validate)</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>TAM users</strong></td>
+<td></td>
+<td></td>
+<td><strong>177.6M</strong></td>
+</tr>
+<tr>
+<td>Routine agent-eligible spend per user per month</td>
+<td>Groceries/quick commerce ₹3,000 + bills &amp; recharges ₹1,500 + travel tickets ₹700 + subscriptions ₹300</td>
+<td>Assumption; validate in survey</td>
+<td>₹5,500</td>
+</tr>
+<tr>
+<td><strong>TAM (GMV/yr)</strong></td>
+<td>177.6M × ₹5,500 × 12</td>
+<td></td>
+<td><strong>₹11.7 lakh crore</strong> (~3.7% of FY26 UPI value)</td>
+</tr>
+<tr>
+<td>AI-active UPI users today</td>
+<td>100M</td>
+<td>ChatGPT weekly users in India, Feb 2026, as a proxy</td>
+<td>100M</td>
+</tr>
+<tr>
+<td><strong>SAM users</strong></td>
+<td>100M × 32%</td>
+<td></td>
+<td><strong>32M</strong></td>
+</tr>
+<tr>
+<td><strong>SAM (GMV/yr)</strong></td>
+<td>32M × ₹5,500 × 12</td>
+<td></td>
+<td><strong>₹2.11 lakh crore</strong></td>
+</tr>
+<tr>
+<td><strong>SAM, autonomous only</strong></td>
+<td>100M × 9% (open to an agent buying on its own) × ₹5,500 × 12</td>
+<td>Accenture 2026</td>
+<td><strong>≈ ₹59,400 crore</strong></td>
+</tr>
+<tr>
+<td>Partner app's share of these users</td>
+<td>30%</td>
+<td>Assumption: a top-3 UPI app</td>
+<td></td>
+</tr>
+<tr>
+<td>Adoption of Rekha among them by Year 3</td>
+<td>20%</td>
+<td>Assumption</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>SOM users (Year 3)</strong></td>
+<td>32M × 30% × 20%</td>
+<td></td>
+<td><strong>1.92M</strong></td>
+</tr>
+<tr>
+<td>Share of eligible spend delegated</td>
+<td>40%</td>
+<td>Assumption</td>
+<td>₹2,200/month</td>
+</tr>
+<tr>
+<td><strong>SOM (GMV/yr, Year 3)</strong></td>
+<td>1.92M × ₹2,200 × 12</td>
+<td></td>
+<td><strong>≈ ₹5,070 crore</strong></td>
+</tr>
+<tr>
+<td>Payments/yr at ₹450 average</td>
+<td></td>
+<td></td>
+<td>≈ 112.6M (≈ 4.9 per user per month)</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Why two SAM numbers.</strong> The 32% covers purchases an agent prepares and the user still approves, which is Rekha's L0 mode. The 9% is the smaller group open to agents paying on their own today, which is Rekha's L1 to L3. The headline SAM uses 32% because Rekha serves both; the autonomous-only figure is the floor.</p>
+<h3 id="top-down-cross-check">Top-down cross-check</h3>
+<p>Quick commerce alone ran at about ₹11,000 crore GMV in a single month in early 2026, which annualises to roughly ₹1.3 lakh crore. If just 10% of quick-commerce orders were placed by agents by 2029, that's ≈ ₹13,200 crore. Our Year-3 SOM of ≈ ₹5,070 crore across <em>all</em> categories through <em>one</em> partner app is well inside that envelope. The bottom-up number is conservative.</p>
+<h3 id="what-would-change-my-mind">What would change my mind</h3>
+<ul>
+<li>If the survey shows routine spend per AI-active user is &lt; ₹3,000/month, SAM halves.</li>
+<li>If interviews show Indians are <em>less</em> willing than the global 32% to delegate selection, SOM falls proportionally.</li>
+<li>If NPCI caps agent payments far below UPI Circle (e.g. ₹2,000/month), the ceiling binds and Rekha's value shifts from "more autonomy" to "safety for small payments".</li>
+</ul>
+<hr>
+<h2 id="4-who-pays-the-zero-mdr-problem">4. Who pays? (the zero-MDR problem)</h2>
+<p>UPI payments from bank accounts to merchants carry <strong>zero merchant discount rate</strong> for most transactions, so a payments-layer product can't take a cut of each transaction the way card products do. That's the hardest strategy question for Rekha.</p>
+<p><strong>November 2026 update:</strong> NPCI planned a 0.4% MDR on select merchant payments above ₹2,000 from 15 October 2026, then deferred it. As of 16 November there is no new start date, though an NPCI circular of 11 November sets up a small-merchant incentive scheme funded from MDR, which suggests it is coming. Even then, P2P transfers, merchant payments up to ₹2,000 and small merchants stay free (more than 95% of merchant payments). A typical agent grocery order (~₹450) stays zero-MDR, so the analysis below still holds. MDR on larger payments does make large merchants care more about agent checkout quality, which strengthens the later Rekha-as-a-service option.</p>
+<h3 id="options">Options</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Model</th>
+<th>How it makes money</th>
+<th>Pros</th>
+<th>Cons</th>
+<th>Verdict</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. Standalone consumer app</strong> (₹49/month)</td>
+<td>Subscription</td>
+<td>Independent brand</td>
+<td>Needs a UPI app licence (TPAP) to sit in the payment flow; low willingness to pay for security apps in India; expensive distribution</td>
+<td>❌ Reject</td>
+</tr>
+<tr>
+<td><strong>B. Rekha-as-a-service</strong> for banks and smaller UPI apps</td>
+<td>Per-decision fee (e.g. ₹0.05–0.10) + platform fee</td>
+<td>Clear revenue; many buyers</td>
+<td>Long bank sales cycles; top UPI apps may build in-house</td>
+<td>⏳ Later (Phase 4)</td>
+</tr>
+<tr>
+<td><strong>C. Feature inside a top UPI app</strong></td>
+<td>Strategic value: agent-payment share, engagement and credit cross-sell, lower fraud and dispute costs</td>
+<td>Distribution, PIN and consent infrastructure, owns the "link an agent" moment</td>
+<td>No direct revenue line; must justify on strategic value</td>
+<td>✅ <strong>Recommend for v1</strong></td>
+</tr>
+<tr>
+<td><strong>D. Paid agent certification</strong></td>
+<td>Fees from agent developers</td>
+<td>Revenue from the supply side</td>
+<td>Conflicts with NPCI's own registry; looks pay-to-play</td>
+<td>❌ Reject</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="value-case-for-option-c-year-3-assumptions-explicit">Value case for option C (Year 3, assumptions explicit)</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Value stream</th>
+<th>Logic</th>
+<th>Annual value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Engagement and cross-sell</td>
+<td>1.92M users with active agents × ₹40 incremental yearly ARPU (credit, insurance, merchant offers)</td>
+<td>≈ ₹7.7 crore</td>
+</tr>
+<tr>
+<td>Fewer disputes</td>
+<td>112.6M agent payments × (0.8% baseline → 0.3%) × ₹250 handling cost per dispute</td>
+<td>≈ ₹14.1 crore</td>
+</tr>
+<tr>
+<td>Fraud losses avoided</td>
+<td>₹5,070 crore GMV × (4 bps → 1 bp)</td>
+<td>≈ ₹1.5 crore</td>
+</tr>
+<tr>
+<td><strong>Quantified total</strong></td>
+<td></td>
+<td><strong>≈ ₹23 crore/yr</strong></td>
+</tr>
+<tr>
+<td>Strategic: keeping agent-payment share</td>
+<td>If agents route payments through whichever UPI app users link, the app with credible controls wins the link. That's the real prize, and it's not in the total above.</td>
+<td>Option value</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Cost:</strong> a team of about 12 (2 PM, 7 engineers, 1 designer, 1 data scientist, 1 risk analyst) is roughly ₹7–9 crore/yr in India, plus about ₹1 crore infrastructure. Decision cost per payment is negligible (rules + cached embeddings); the LLM is only used when a Rekha is created or edited.</p>
+<p><strong>Conclusion:</strong> option C pays back on quantifiable value alone by Year 3, and the strategic option value (agent-payment share) is the reason to start now rather than later. A second reason appeared in September 2026: the official launch of agent payments is reported paused over user protection and liability, so an app that can show working controls and dispute evidence is better placed to be allowed to launch.</p>
+<hr>
+<h2 id="5-competitive-strategy">5. Competitive strategy</h2>
+<h3 id="right-to-win-inside-a-upi-app">Right to win (inside a UPI app)</h3>
+<ol>
+<li><strong>Owns the moment of trust:</strong> linking an agent happens in the UPI app, with the UPI PIN.</li>
+<li><strong>Neutral to agents:</strong> the app doesn't earn from the agent's choice of product, so it can credibly judge purchases. Agent platforms can't.</li>
+<li><strong>Cross-agent view:</strong> only the user's payment app sees every agent's payments, which enables duplicate detection (R18) and cross-agent attack patterns.</li>
+</ol>
+<h3 id="moats-over-time-7-powers">Moats over time (7 Powers)</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Power</th>
+<th>How Rekha builds it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Network effects (data)</strong></td>
+<td>Every blocked attack across all agents and merchants improves detection for every user</td>
+</tr>
+<tr>
+<td><strong>Switching costs</strong></td>
+<td>Rekhas, history and earned autonomy (Trust Ramp) live in the app</td>
+</tr>
+<tr>
+<td><strong>Counter-positioning</strong></td>
+<td>Agent platforms can't be the neutral judge of their own purchases without hurting conversion</td>
+</tr>
+<tr>
+<td><strong>Process power</strong></td>
+<td>Festive calendars, red-team suites, dispute-evidence standards</td>
+</tr>
+<tr>
+<td><strong>Branding</strong></td>
+<td>"Protected by Rekha" becomes a trust signal on agent checkout</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="what-if-scenarios">"What if…" scenarios</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Likelihood</th>
+<th>Response</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NPCI mandates standard agent controls for all apps</td>
+<td>Medium</td>
+<td>Good for the category. Rekha becomes the best implementation and contributes to the standard through the UAP working group. Differentiation shifts to intent-level controls, UX and detection quality.</td>
+</tr>
+<tr>
+<td>A big agent platform ships strong in-agent controls</td>
+<td>High</td>
+<td>Users with more than one agent still need one view; banks and regulators prefer user-side controls. Integrate: show the agent's own limits inside Rekha.</td>
+</tr>
+<tr>
+<td>A rival UPI app copies Rekha</td>
+<td>High</td>
+<td>Expected. Win on speed, agent partnerships signed during the pilot, and data network effects.</td>
+</tr>
+<tr>
+<td>Card networks bring Verifiable Intent-style proofs to UPI through partners</td>
+<td>Medium</td>
+<td>Treat it as an input: read the signed intent as one more signal. Rekha's value stays in the user's own app: plain-language rules, a view across agents, and recovery.</td>
+</tr>
+<tr>
+<td>Agent payments grow much slower than expected</td>
+<td>Medium</td>
+<td>Rekha's kill switch, limits and cooling windows still serve RBI's customer-controlled safeguards agenda for <em>all</em> digital payments, not just agents.</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2 id="6-go-to-market">6. Go-to-market</h2>
+<h3 id="positioning-and-messaging">Positioning and messaging</h3>
+<ul>
+<li><strong>Tagline:</strong> <em>Draw the line for your AI agents.</em></li>
+<li><strong>One-liner a user would repeat:</strong> "My agent can pay for groceries and bills, but only what I said, only where I said, and I can stop it in one tap."</li>
+<li><strong>Launch narrative:</strong> "RBI asked for customer-controlled safeguards, and agent payments on UPI are waiting on them. Rekha is what those safeguards look like for AI agents."</li>
+</ul>
+<h3 id="phased-plan">Phased plan</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>When</th>
+<th>Goal</th>
+<th>Key actions</th>
+<th>Exit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>0. Validate</strong></td>
+<td>6 weeks</td>
+<td>Prove the problem is real</td>
+<td>8 user interviews, 3 fintech expert interviews, survey (n ≥ 150), fake-door landing page, prototype usability tests (<code>06_Validation_Plan.md</code>)</td>
+<td>Assumptions A1–A3 pass</td>
+</tr>
+<tr>
+<td><strong>1. Shadow</strong></td>
+<td>4 weeks</td>
+<td>Prove the engine is accurate and fast</td>
+<td>Run on the partner's agent-payment traffic (mandate-based today, UAP once live), log only</td>
+<td>False-block ≤ 3% on review; p95 &lt; 300 ms</td>
+</tr>
+<tr>
+<td><strong>2. Closed beta</strong></td>
+<td>4 weeks</td>
+<td>Prove it's usable and safe</td>
+<td>5,000 invited users, L0–L1</td>
+<td>Dispute ≤ 0.3%, CSAT ≥ 4</td>
+</tr>
+<tr>
+<td><strong>3. Pilot</strong></td>
+<td>12 weeks</td>
+<td>Prove the North Star moves</td>
+<td>50,000 users in 3 metros; 2 agent partners; groceries + bills + recharges</td>
+<td>PRD §2 goals</td>
+</tr>
+<tr>
+<td><strong>4. GA</strong></td>
+<td>After festive freeze</td>
+<td>Scale</td>
+<td>1% → 100% rollout; Tier-1 launch</td>
+<td>Guardrails hold at each step</td>
+</tr>
+<tr>
+<td><strong>5. Platform</strong></td>
+<td>Year 2</td>
+<td>Expand</td>
+<td>Family Rekha, Hindi, Rekha-as-a-service, credit-on-UPI</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Timing call:</strong> don't take GA live during Diwali or major sale weeks. Those are peak scam season and peak traffic, so a launch-week incident would be most likely and most damaging. Launch after the festive code freeze.</p>
+<h3 id="pilot-design">Pilot design</h3>
+<ul>
+<li><strong>Who:</strong> users who have linked an agent, place ≥ 4 quick-commerce orders a month and pay ≥ 3 bills a month through the app; Android and iOS; Bengaluru, Delhi NCR, Mumbai.</li>
+<li><strong>Agents:</strong> 2 partners (one general assistant, one shopping-focused).</li>
+<li><strong>Categories:</strong> quick-commerce groceries, utility bills, mobile recharges.</li>
+<li><strong>Holdout:</strong> 10% of eligible users get agent payments with only the rail's own limits (no Rekha), to measure Rekha's effect on agent adoption and disputes. This is ethical because the holdout gets the same protection as the status quo, not less.</li>
+</ul>
+<h3 id="channels">Channels</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Channel</th>
+<th>Mechanism</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>The linking moment (primary)</strong></td>
+<td>Every agent link opens the Rekha builder with a safe starter Rekha</td>
+</tr>
+<tr>
+<td><strong>Agent partners</strong></td>
+<td>"Pay with UPI, protected by Rekha" in agent checkout</td>
+</tr>
+<tr>
+<td><strong>In-app education</strong></td>
+<td>Short explainers in English and Hindi; weekly digest</td>
+</tr>
+<tr>
+<td><strong>Family loop (Phase 5)</strong></td>
+<td>Guardians set up Family Rekha for parents, so parents become users and their peers see it</td>
+</tr>
+<tr>
+<td><strong>PR / regulator</strong></td>
+<td>Submit learnings to RBI's consultation process; NPCI UAP working group</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2 id="7-roadmap-now-next-later">7. Roadmap (Now / Next / Later)</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Now (Q4 2026 – Q1 2027)</th>
+<th>Next (Q2 – Q3 2027)</th>
+<th>Later (Q4 2027 +)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Validation sprint</td>
+<td>Trust Ramp</td>
+<td>Family Rekha (guardian mode)</td>
+</tr>
+<tr>
+<td>Shadow mode on agent-payment traffic</td>
+<td>Verified-agent badge (registry)</td>
+<td>Credit-on-UPI support</td>
+</tr>
+<tr>
+<td>MVP: builder, decision engine, approvals, activity, kill switch</td>
+<td>Hindi (Devanagari) input</td>
+<td>Rekha-as-a-service for banks and smaller apps</td>
+</tr>
+<tr>
+<td>Intent Lock + Injection Shield v1</td>
+<td>Partial approvals ("pay for groceries only")</td>
+<td>Cross-rail: card agent tokens (Visa, Mastercard)</td>
+</tr>
+<tr>
+<td>Report-a-problem + evidence pack (lite)</td>
+<td>Full dispute tracking</td>
+<td>AP2 mandate interoperability</td>
+</tr>
+<tr>
+<td>Weekly digest</td>
+<td>ML risk model v1 (can only escalate)</td>
+<td>Business Rekhas for small merchants</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2 id="8-stakeholders">8. Stakeholders</h2>
+<h3 id="powerinterest-map">Power–interest map</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th></th>
+<th>Low interest</th>
+<th>High interest</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>High power</strong></td>
+<td>RBI (keep satisfied: consultation input) · Large agent platforms</td>
+<td>Partner UPI app leadership · PSP bank risk team · NPCI UAP team · Legal &amp; compliance (<strong>manage closely</strong>)</td>
+</tr>
+<tr>
+<td><strong>Low power</strong></td>
+<td>General public</td>
+<td>Pilot users · Merchants · Consumer groups (<strong>keep informed</strong>)</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="raci">RACI</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Activity</th>
+<th>PM (Rekha)</th>
+<th>Eng lead</th>
+<th>Design</th>
+<th>Risk &amp; fraud</th>
+<th>Legal</th>
+<th>PSP partner</th>
+<th>Agent partners</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Problem validation</td>
+<td><strong>A/R</strong></td>
+<td>C</td>
+<td>R</td>
+<td>C</td>
+<td>I</td>
+<td>I</td>
+<td>C</td>
+</tr>
+<tr>
+<td>Decision rules R00–R18</td>
+<td>A</td>
+<td>R</td>
+<td>I</td>
+<td><strong>R</strong></td>
+<td>C</td>
+<td>C</td>
+<td>I</td>
+</tr>
+<tr>
+<td>Builder UX</td>
+<td>A</td>
+<td>C</td>
+<td><strong>R</strong></td>
+<td>C</td>
+<td>I</td>
+<td>I</td>
+<td>I</td>
+</tr>
+<tr>
+<td>Liability and dispute language</td>
+<td>C</td>
+<td>I</td>
+<td>C</td>
+<td>C</td>
+<td><strong>A/R</strong></td>
+<td>C</td>
+<td>I</td>
+</tr>
+<tr>
+<td>Shadow mode and rollout</td>
+<td><strong>A</strong></td>
+<td>R</td>
+<td>I</td>
+<td>R</td>
+<td>I</td>
+<td>C</td>
+<td>C</td>
+</tr>
+<tr>
+<td>Agent integration (intent, trace)</td>
+<td>A</td>
+<td>R</td>
+<td>I</td>
+<td>C</td>
+<td>C</td>
+<td>I</td>
+<td><strong>R</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>R = Responsible, A = Accountable, C = Consulted, I = Informed.</p>
+<hr>
+<h2 id="9-pre-mortem">9. Pre-mortem</h2>
+<blockquote>
+<p><em>It's October 2027 and Rekha has been shut down. What happened?</em></p>
+</blockquote>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>Failure story</th>
+<th>Likelihood</th>
+<th>Impact</th>
+<th>Early signal</th>
+<th>Mitigation (built into the plan)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Users never customised Rekhas; the starter Rekha was "good enough" and nobody saw value</td>
+<td>Medium</td>
+<td>High</td>
+<td>W1 creation rate &lt; 20%</td>
+<td>Templates; builder opens at the linking moment; digest shows what Rekha caught</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Approval fatigue: users set everything to L3 or unlinked agents</td>
+<td>Medium</td>
+<td>High</td>
+<td>False-ASK rate &gt; 40%</td>
+<td>Anomaly-only ASKs; Trust Ramp; reason-first cards</td>
+</tr>
+<tr>
+<td>3</td>
+<td>A festive-season false-block wave caused a social-media backlash</td>
+<td>Medium</td>
+<td>Medium</td>
+<td>False-block spikes by category</td>
+<td>Festive calendar; shadow-test new catalog categories; fast tolerance switches (see RCA in <code>03</code>)</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Agent platforms refused to pass intent and trace</td>
+<td>Medium</td>
+<td>High</td>
+<td>Partner integration slips</td>
+<td>Rekha-only and cart-only checks still work; make trace-sharing a condition of the "registered and protected" badge</td>
+</tr>
+<tr>
+<td>5</td>
+<td>NPCI's liability rules put losses on the app, so legal blocked launch</td>
+<td>Low–Med</td>
+<td>High</td>
+<td>Liability draft</td>
+<td>Evidence packs designed to settle disputes fast under any regime; active participation in the working group</td>
+</tr>
+<tr>
+<td>6</td>
+<td>A parser bug created a looser policy and an agent overspent</td>
+<td>Low</td>
+<td>High</td>
+<td>Looser-than-intended rate in sampling</td>
+<td>Asymmetric eval gate ≤ 0.5%; user confirms every field; caps validator</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Agent payments grew slower than expected</td>
+<td>Medium</td>
+<td>Medium</td>
+<td>UAP volumes</td>
+<td>Kill switch and limits also serve RBI's customer-safeguards agenda for all digital payments</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2 id="10-risk-register-top-5-tracked-weekly">10. Risk register (top 5, tracked weekly)</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Risk</th>
+<th>Owner</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UAP launch paused; registry API timing unknown</td>
+<td>Partnerships</td>
+<td>Open: fall back to mandate-based agent payments, and treat agents as unregistered (L0 only) until a registry exists</td>
+</tr>
+<tr>
+<td>Liability regime unclear</td>
+<td>Legal</td>
+<td>Open: evidence pack ready for any outcome</td>
+</tr>
+<tr>
+<td>Decision latency &gt; 300 ms on low-end devices or networks</td>
+<td>Eng</td>
+<td>Mitigated: server-side decisions only</td>
+</tr>
+<tr>
+<td>Hinglish parsing accuracy below threshold</td>
+<td>ML</td>
+<td>Open: eval set being built</td>
+</tr>
+<tr>
+<td>Partner bank risk appetite</td>
+<td>PM</td>
+<td>Open: shadow-mode results are the main persuasion tool</td>
+</tr>
+</tbody>
+</table></div>
+<nav class="pager" aria-label="Documents">
+  <span><a href="03_Metrics_and_Experiments.html">← Metrics &amp; Experiments</a></span><span><a href="05_Trust_Safety_Threat_Model.html">Threat Model →</a></span>
+</nav>
+<p class="foot">Rekha is a concept case study by Abhishek Kumar. Market facts are cited; sizing and targets are labelled assumptions.</p>
+</article>
+</main>
+</body>
+</html>

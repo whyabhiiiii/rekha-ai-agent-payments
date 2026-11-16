@@ -1,0 +1,624 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Metrics &amp; Experiments · Rekha</title>
+<meta name="description" content="Metrics &amp; Experiments: part of Rekha, a product case study on spending limits for AI agents on UPI, by Abhishek Kumar.">
+<meta property="og:title" content="Metrics &amp; Experiments · Rekha">
+<meta property="og:image" content="https://whyabhiiiii.github.io/rekha-ai-agent-payments/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%235B3CC4'/%3E%3Cpath d='M12 42C24 26 40 22 52 24' fill='none' stroke='white' stroke-width='6' stroke-linecap='round'/%3E%3Ccircle cx='12' cy='42' r='5' fill='white'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&family=Rozha+One&display=swap">
+<style>
+/* Layout: a single reading column pinned to the same violet margin rule as the case study. */
+:root {
+  --paper: #F6F5FA; --surface: #FFFFFF; --ink: #17162B; --muted: #5D5B73; --faint: #6A6783; --rule: #E2E0EC;
+  --line: #5B3CC4; --line-ink: #4A2FB0; --line-soft: #EEEAFC;
+  --f-display: "Rozha One", "Noto Serif Devanagari", Georgia, serif;
+  --f-body: "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #121120; --surface: #1C1B2C; --ink: #ECEAF6; --muted: #A9A6C0; --faint: #908DA9; --rule: #2D2B42;
+    --line: #A792FF; --line-ink: #C4B6FF; --line-soft: #262046; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #121120; --surface: #1C1B2C; --ink: #ECEAF6; --muted: #A9A6C0; --faint: #908DA9; --rule: #2D2B42;
+  --line: #A792FF; --line-ink: #C4B6FF; --line-soft: #262046; color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 17px/1.65 var(--f-body); }
+a { color: var(--line-ink); text-underline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--line); outline-offset: 2px; }
+.top { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; justify-content: space-between;
+  padding: 14px max(16px, 4vw); border-bottom: 1px solid var(--rule); background: var(--paper); position: sticky; top: env(safe-area-inset-top, 0px); z-index: 2; }
+.mark { display: inline-flex; align-items: baseline; gap: 8px; text-decoration: none; color: var(--ink); }
+.mark .dev { font-family: var(--f-display); font-size: 26px; line-height: 1; border-bottom: 3px solid var(--line); }
+.mark .lat { font-family: var(--f-display); font-size: 18px; }
+.top nav { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 14.5px; font-weight: 600; }
+.top nav a { text-decoration: none; }
+.top nav a:hover { text-decoration: underline; }
+.wrap { max-width: 980px; margin: 0 auto; padding: 32px max(16px, 4vw) 64px; }
+article { border-left: 2px solid var(--line); padding-left: clamp(16px, 4vw, 40px); min-width: 0; }
+article > * { max-width: 72ch; }
+article > .tw, article > pre, article > .mermaid-wrap { max-width: none; }
+h1 { font-family: var(--f-display); font-weight: 400; font-size: clamp(32px, 5vw, 48px); line-height: 1.08; margin: 0 0 18px; text-wrap: balance; }
+h2 { font-family: var(--f-display); font-weight: 400; font-size: clamp(25px, 3.4vw, 32px); line-height: 1.15; margin: 44px 0 12px; text-wrap: balance; }
+h3 { font-size: 19px; margin: 28px 0 8px; }
+h4 { font-size: 16px; margin: 20px 0 6px; }
+p, li { margin: 0 0 12px; }
+ul, ol { padding-left: 22px; margin: 0 0 14px; }
+hr { border: 0; border-top: 1px solid var(--rule); margin: 32px 0; }
+blockquote { margin: 0 0 16px; padding: 10px 16px; border-left: 4px solid var(--line); background: var(--line-soft); border-radius: 0 12px 12px 0; }
+blockquote p:last-child { margin-bottom: 0; }
+code { font-family: var(--f-mono); font-size: .86em; background: var(--line-soft); color: var(--line-ink); padding: 1px 5px; border-radius: 5px; }
+pre { background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; padding: 14px 16px; overflow-x: auto; margin: 0 0 16px; }
+pre code { background: none; color: var(--ink); padding: 0; font-size: 13.5px; line-height: 1.55; }
+.tw { overflow-x: auto; border: 1px solid var(--rule); border-radius: 12px; background: var(--surface); margin: 0 0 18px; }
+table { width: 100%; border-collapse: collapse; font-size: 14.5px; min-width: 560px; }
+th { text-align: left; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; padding: 10px 12px; border-bottom: 1px solid var(--rule); }
+td { padding: 9px 12px; border-top: 1px solid var(--rule); vertical-align: top; }
+tr:first-child td { border-top: 0; }
+.mermaid-wrap { background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; padding: 16px; overflow-x: auto; margin: 0 0 18px; }
+pre.mermaid { border: 0; padding: 0; margin: 0; background: none; overflow: visible; }
+pre.mermaid svg { display: block; margin-inline: auto; }
+/* trees (opportunity tree, metric tree): nested lists drawn with connector lines */
+ul.tree { list-style: none; padding: 14px 16px; margin: 0 0 18px; max-width: none; background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; font-size: 15.5px; }
+ul.tree ul { list-style: none; margin: 8px 0 4px 6px; padding-left: 18px; border-left: 2px solid var(--line-soft); }
+ul.tree li { margin: 0 0 6px; line-height: 1.5; }
+ul.tree > li > ul > li { margin-bottom: 12px; }
+ul.tree em { color: var(--muted); font-size: .93em; }
+.pager { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 48px; padding-top: 18px; border-top: 1px solid var(--rule); font-weight: 600; }
+.foot { margin-top: 24px; font-size: 13.5px; color: var(--faint); }
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="mark" href="../index.html"><span class="dev" lang="hi">रेखा</span><span class="lat">Rekha</span></a>
+  <nav aria-label="Project">
+    <a href="../index.html">Case study</a>
+    <a href="../prototype.html">Prototype</a>
+    <a href="../index.html#docs">All documents</a>
+  </nav>
+</header>
+<main class="wrap">
+<article>
+<h1 id="03-metrics-and-experiments">03 · Metrics and Experiments</h1>
+<hr>
+<h2 id="1-north-star-metric">1. North Star Metric</h2>
+<h3 id="trusted-autonomous-payments-tap-per-week">Trusted Autonomous Payments (TAP) per week</h3>
+<blockquote>
+<p><strong>The number of agent-initiated payments in a week that were completed inside a Rekha without needing a step-up, and were not reported, disputed or reversed within 7 days.</strong></p>
+</blockquote>
+<p><strong>Why this metric:</strong>
+- It captures <strong>user value</strong> (the agent did the job without bothering me) and <strong>trust</strong> (it got it right) in one number.
+- It's a <strong>leading indicator</strong> of the business outcome: more trusted autonomous payments means more agent commerce flowing through the partner's UPI app.
+- The team can move it directly through better Rekhas, smarter step-ups, Trust Ramp and safety.
+- The 7-day dispute filter makes it <strong>self-guarding</strong>. Loosening rules to cut step-ups would raise disputes and remove those payments from the count.</p>
+<p><strong>Alternatives considered and rejected:</strong></p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Candidate</th>
+<th>Why not</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Agent GMV (₹)</td>
+<td>Rewards bigger payments, which means more risk; one large order outweighs many small trusted ones</td>
+</tr>
+<tr>
+<td>Number of Rekhas created</td>
+<td>Vanity metric: creation without use isn't value</td>
+</tr>
+<tr>
+<td>Number of blocks</td>
+<td>Perverse: the team would "win" by blocking more</td>
+</tr>
+<tr>
+<td>% auto-allowed</td>
+<td>Easy to game by loosening rules; no quality filter</td>
+</tr>
+<tr>
+<td>Weekly active users</td>
+<td>Doesn't capture whether the agent actually did the job</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2 id="2-metric-tree">2. Metric tree</h2>
+<ul class="tree">
+<li><strong>North Star: Trusted Autonomous Payments per week</strong><ul>
+<li><strong>Breadth:</strong> users with at least one active Rekha<ul>
+<li>Agent link rate</li>
+<li>Rekha creation rate (week 1)</li>
+<li>Rekha retention (still active at day 30)</li>
+</ul>
+</li>
+<li><strong>Frequency:</strong> agent payments per active user per week<ul>
+<li>Number of Rekha purposes per user</li>
+<li>Autonomy mix: % of agents at L1 or above</li>
+<li>Trust Ramp acceptance</li>
+</ul>
+</li>
+<li><strong>Quality:</strong> % of payments auto-allowed and not disputed<ul>
+<li>Auto-allow rate</li>
+<li>False-ASK rate (asks the user approves unchanged)</li>
+<li>Dispute rate within 7 days</li>
+<li>False-block rate</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="input-metrics">Input metrics</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Definition</th>
+<th>Pilot target</th>
+<th>Owner</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Agent link rate</td>
+<td>% of eligible users who link ≥ 1 agent</td>
+<td>15%</td>
+<td>Growth PM</td>
+</tr>
+<tr>
+<td>Rekha creation rate (W1)</td>
+<td>% of linked users who save a customised Rekha in week 1</td>
+<td>≥ 35%</td>
+<td>Rekha PM</td>
+</tr>
+<tr>
+<td>Time to first Rekha</td>
+<td>Median seconds from builder open to save</td>
+<td>&lt; 90 s</td>
+<td>Design</td>
+</tr>
+<tr>
+<td>Rekha day-30 retention</td>
+<td>% of Rekhas still active and used at day 30</td>
+<td>≥ 50%</td>
+<td>Rekha PM</td>
+</tr>
+<tr>
+<td>Autonomy mix</td>
+<td>% of active agents at L1 or above</td>
+<td>≥ 40% by week 8</td>
+<td>Rekha PM</td>
+</tr>
+<tr>
+<td>Auto-allow rate</td>
+<td>% of agent payments ALLOWed without step-up</td>
+<td>≥ 60%</td>
+<td>Risk PM</td>
+</tr>
+<tr>
+<td>False-ASK rate</td>
+<td>% of ASKs approved unchanged within 2 minutes (a proxy for "you didn't need to ask")</td>
+<td>≤ 35%</td>
+<td>Risk PM</td>
+</tr>
+<tr>
+<td>Step-up response time</td>
+<td>Median time to approve or reject</td>
+<td>&lt; 45 s</td>
+<td>Design</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2 id="3-guardrails-must-not-get-worse">3. Guardrails (must not get worse)</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Guardrail</th>
+<th>Threshold</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fraud loss on agent payments</td>
+<td>≤ the partner's UPI P2M baseline (basis points of value)</td>
+<td>Rekha must not make agent payments riskier than normal UPI</td>
+</tr>
+<tr>
+<td>Dispute rate (7-day)</td>
+<td>≤ 0.3% of agent payments</td>
+<td>Trust</td>
+</tr>
+<tr>
+<td>False-block rate</td>
+<td>≤ 2% (BLOCKs the user later marks "this was fine")</td>
+<td>Don't break legitimate commerce</td>
+</tr>
+<tr>
+<td>Decision latency</td>
+<td>p95 &lt; 300 ms, p99 &lt; 600 ms</td>
+<td>UPI success rates</td>
+</tr>
+<tr>
+<td>UPI success rate for agent payments</td>
+<td>Within 1 pp of non-agent P2M</td>
+<td>Partner's core KPI</td>
+</tr>
+<tr>
+<td>Kill-switch activation rate</td>
+<td>Alert if &gt; 3× the 4-week average in a day</td>
+<td>Early warning of an incident or a confusing release</td>
+</tr>
+<tr>
+<td>Complaints to partner support about agents</td>
+<td>≤ 0.5 per 1,000 agent payments</td>
+<td>Support cost and brand</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Goodhart check:</strong> the team is measured on TAP <em>and</em> the guardrails together. Any experiment that lifts TAP while breaching a guardrail is a failed experiment.</p>
+<hr>
+<h2 id="4-heart-framework">4. HEART framework</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th></th>
+<th>Goal</th>
+<th>Signal</th>
+<th>Metric</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Happiness</strong></td>
+<td>Users feel in control</td>
+<td>Survey after week 2</td>
+<td><strong>Trust Index</strong> (below) ≥ 4.2/5</td>
+</tr>
+<tr>
+<td><strong>Engagement</strong></td>
+<td>Users rely on agents for routine spend</td>
+<td>Weekly agent payments</td>
+<td>Agent payments per active user per week</td>
+</tr>
+<tr>
+<td><strong>Adoption</strong></td>
+<td>Users set boundaries</td>
+<td>Rekhas saved</td>
+<td>Rekha creation rate (W1)</td>
+</tr>
+<tr>
+<td><strong>Retention</strong></td>
+<td>Users keep agents linked</td>
+<td>Agents still linked</td>
+<td>Linked-agent retention at day 30 / 60</td>
+</tr>
+<tr>
+<td><strong>Task success</strong></td>
+<td>Setup and approvals are easy</td>
+<td>Builder completion; correct approvals</td>
+<td>Builder completion ≥ 80%; time to first Rekha &lt; 90 s; drill accuracy ≥ 90%</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="trust-index-3-item-in-app-survey-15-scale">Trust Index (3-item in-app survey, 1–5 scale)</h3>
+<ol>
+<li>"I know what my agents are allowed to spend money on."</li>
+<li>"If an agent made a mistake, I could fix it quickly."</li>
+<li>"I'm comfortable letting my agent pay for routine things without asking me."</li>
+</ol>
+<hr>
+<h2 id="5-activation-and-the-funnel">5. Activation and the funnel</h2>
+<p><strong>Activation (hypothesis):</strong> <em>user saves a customised Rekha </em><em>and</em><em> has their first protected payment within 7 days.</em> Hypothesis: users who reach this are ≥ 2× more likely to have an agent linked at day 30. Validate in the pilot with a cohort comparison.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Funnel step</th>
+<th>Pilot target (from previous step)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Eligible user sees agent-link prompt</td>
+<td>n/a</td>
+</tr>
+<tr>
+<td>Links an agent</td>
+<td>15%</td>
+</tr>
+<tr>
+<td>Saves a customised Rekha</td>
+<td>60%</td>
+</tr>
+<tr>
+<td>First protected payment within 7 days</td>
+<td>70%</td>
+</tr>
+<tr>
+<td>Still linked at day 30</td>
+<td>65%</td>
+</tr>
+<tr>
+<td>Reaches L1+ autonomy</td>
+<td>50%</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2 id="6-dashboards">6. Dashboards</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Dashboard</th>
+<th>Audience</th>
+<th>Tiles</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Weekly business review</strong></td>
+<td>Leadership, partner</td>
+<td>TAP trend, users with Rekhas, auto-allow rate, dispute rate, fraud loss vs baseline</td>
+</tr>
+<tr>
+<td><strong>Risk operations (real time)</strong></td>
+<td>Risk &amp; fraud</td>
+<td>BLOCKs by reason code (hourly), R14/R17 spikes, kill-switch rate, top merchants by ASK rate, new payees</td>
+</tr>
+<tr>
+<td><strong>AI quality</strong></td>
+<td>ML + PM</td>
+<td>Parser looser-than-intended rate (sampled), user edits per Rekha draft, Intent Lock false-ASK rate, eval regression status</td>
+</tr>
+<tr>
+<td><strong>Experience</strong></td>
+<td>Design + PM</td>
+<td>Time to first Rekha, builder drop-off by step, step-up response time, Trust Index</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="sql-north-star">SQL: North Star</h3>
+<pre><code class="language-sql">-- Trusted Autonomous Payments per ISO week
+SELECT
+  DATE_TRUNC('week', d.created_at AT TIME ZONE 'Asia/Kolkata') AS week_ist,
+  COUNT(*) AS trusted_autonomous_payments
+FROM decisions d
+JOIN payments p ON p.request_id = d.request_id
+LEFT JOIN disputes x
+  ON x.request_id = d.request_id
+ AND x.created_at &lt;= p.completed_at + INTERVAL '7 days'
+WHERE d.decision = 'ALLOW'
+  AND p.status = 'SUCCESS'
+  AND p.reversed = FALSE
+  AND x.request_id IS NULL               -- no dispute or report within 7 days
+  AND p.completed_at &lt;= NOW() - INTERVAL '7 days'  -- only fully matured payments
+GROUP BY 1
+ORDER BY 1;
+</code></pre>
+<hr>
+<h2 id="7-experiments">7. Experiments</h2>
+<p>Sample sizes use a two-sided test at α = 0.05 and 80% power:
+n per arm ≈ (1.96 + 0.84)² × [p₁(1−p₁) + p₂(1−p₂)] ÷ (p₂ − p₁)²</p>
+<h3 id="e1-trust-ramp-nudge">E1: Trust Ramp nudge</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Hypothesis</strong></td>
+<td>We believe offering a one-tap upgrade to L1 after 5 clean payments, with the agent's track record, will increase the share of agents at L1+ because users trust evidence of past behaviour (Accenture: 31% say low-cost, low-risk purchases would make them more comfortable).</td>
+</tr>
+<tr>
+<td><strong>Population</strong></td>
+<td>Users whose agent has ≥ 5 clean payments at L0</td>
+</tr>
+<tr>
+<td><strong>Variants</strong></td>
+<td>Control: no prompt (users can change autonomy in settings). Treatment: Trust Ramp card in the activity feed and digest.</td>
+</tr>
+<tr>
+<td><strong>Primary metric</strong></td>
+<td>% of eligible agents at L1+ at day 28 after eligibility</td>
+</tr>
+<tr>
+<td><strong>Baseline → MDE</strong></td>
+<td>20% → 23% (+3 pp absolute)</td>
+</tr>
+<tr>
+<td><strong>Sample size</strong></td>
+<td><strong>2,940 per arm</strong> (5,880 total)</td>
+</tr>
+<tr>
+<td><strong>Duration</strong></td>
+<td>~4 weeks to accrue at expected eligibility rates in a 50k pilot, plus 28-day measurement</td>
+</tr>
+<tr>
+<td><strong>Guardrails</strong></td>
+<td>Dispute rate among upgraded agents; kill-switch rate; ASK→reject rate after upgrade</td>
+</tr>
+<tr>
+<td><strong>Decision rule</strong></td>
+<td>Ship if primary is significant <strong>and</strong> guardrails don't worsen beyond noise. If uptake rises but disputes rise too, the ramp threshold (5 payments) is too low: test 10.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="e2-plain-language-builder-vs-form-builder">E2: Plain-language builder vs form builder</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Hypothesis</strong></td>
+<td>We believe the plain-language builder will increase Rekha completion vs a classic form, because users describe intent more naturally than they fill structured fields.</td>
+</tr>
+<tr>
+<td><strong>Variants</strong></td>
+<td>Control: form (purpose dropdown, merchants, amount, period). Treatment: text box + structured confirm card.</td>
+</tr>
+<tr>
+<td><strong>Primary metric</strong></td>
+<td>Rekha save rate among users who open the builder</td>
+</tr>
+<tr>
+<td><strong>Baseline → MDE</strong></td>
+<td>55% → 62% (+7 pp)</td>
+</tr>
+<tr>
+<td><strong>Sample size</strong></td>
+<td><strong>774 per arm</strong></td>
+</tr>
+<tr>
+<td><strong>Secondary</strong></td>
+<td>Time to save; fields edited after parse; looser-than-intended rate (sampled human review)</td>
+</tr>
+<tr>
+<td><strong>Guardrails</strong></td>
+<td>Looser-than-intended rate must stay ≤ 0.5% (a safety guardrail inside a UX test)</td>
+</tr>
+<tr>
+<td><strong>Watch out for</strong></td>
+<td>Novelty effect: compare week 1 vs week 2 of exposure before deciding</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="e3-reason-first-approval-card-safety-drills">E3: Reason-first approval card ("safety drills")</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Hypothesis</strong></td>
+<td>We believe leading the approval card with the reason ("Not groceries: air fryer, ₹3,999") rather than the amount will raise correct rejections of suspicious requests, because users decide on the first line they read.</td>
+</tr>
+<tr>
+<td><strong>Method</strong></td>
+<td>Opt-in <strong>safety drills</strong>, borrowed from corporate phishing simulations. Users who opt in occasionally receive a realistic simulated suspicious request. No money moves; it's revealed as a drill after they respond. This gives ground truth without exposing anyone to real fraud.</td>
+</tr>
+<tr>
+<td><strong>Primary metric</strong></td>
+<td>% of drill requests correctly rejected</td>
+</tr>
+<tr>
+<td><strong>Baseline → MDE</strong></td>
+<td>80% → 88%</td>
+</tr>
+<tr>
+<td><strong>Sample size</strong></td>
+<td><strong>326 per arm</strong> (drill responses)</td>
+</tr>
+<tr>
+<td><strong>Guardrails</strong></td>
+<td>Time to decide on real ASKs; drill opt-out rate (if &gt; 20%, drills are annoying)</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="pitfalls-checklist-applies-to-all">Pitfalls checklist (applies to all)</h3>
+<ul>
+<li><strong>Sample ratio mismatch:</strong> check the split is 50/50 within ±1% before reading results.</li>
+<li><strong>No peeking:</strong> fixed horizon, or a sequential test with pre-registered stopping rules.</li>
+<li><strong>Novelty:</strong> compare early vs late exposure.</li>
+<li><strong>Interference:</strong> users with Family Rekha share agents; randomise by household.</li>
+<li><strong>Multiple comparisons:</strong> one primary metric per test; secondaries are directional only.</li>
+<li><strong>Variance reduction:</strong> CUPED with each user's pre-period agent-payment count.</li>
+</ul>
+<hr>
+<h2 id="8-how-we-test-safety-features-and-why-not-with-an-ab-test">8. How we test safety features (and why not with an A/B test)</h2>
+<p>You <strong>cannot</strong> run a control arm where Injection Shield is off for real users. That means knowingly letting manipulated payments through. Instead:</p>
+<ol>
+<li><strong>Shadow mode</strong> (Phase 0): the engine logs what it <em>would</em> do on real traffic without enforcing. A risk analyst reviews a stratified sample of 1,000 decisions to estimate precision and recall.</li>
+<li><strong>Red-team suite:</strong> 20 scripted attack scenarios (<code>05_Trust_Safety_Threat_Model.md</code>) run against every release. Recall must be ≥ 95%.</li>
+<li><strong>Staged rollout with monitoring:</strong> 1% → 10% → 50% → 100%, watching false-block rate and partner success rate at each step.</li>
+<li><strong>Safety drills</strong> (E3) to measure the human part of the loop.</li>
+</ol>
+<hr>
+<h2 id="9-root-cause-analysis-worked-example">9. Root-cause analysis: worked example</h2>
+<blockquote>
+<p><strong>Prompt:</strong> "On 21 Oct 2026, the false-block rate tripled from 1.6% to 4.9%. Users are complaining on social media that Rekha is blocking their Diwali orders. What do you do?"</p>
+</blockquote>
+<p><strong>Step 1: Clarify the metric and scope.</strong> False-block = BLOCK or ASK-then-rejected decisions that users later mark "this was fine". The jump started around 18:00 IST on 20 Oct. Is this all agents or one? All merchants or some? All cities?</p>
+<p><strong>Step 2: Check the data first.</strong> Was there an instrumentation change? A new "mark as fine" button placement could inflate reports. <em>Finding: no client release in 7 days; logging volumes normal. The rise is real.</em></p>
+<p><strong>Step 3: Internal changes.</strong> Rule or threshold deploys? Parser model update? Merchant data sync? <em>Finding: no rule changes. The merchant catalog sync ran as usual.</em></p>
+<p><strong>Step 4: External factors.</strong> Diwali sales started 20 Oct. Quick-commerce merchants launched festive gift bundles ("Diwali dry-fruit hamper", "pooja kit"). Order sizes are up.</p>
+<p><strong>Step 5: Segment.</strong> Break false-blocks down by reason code:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Reason</th>
+<th>Share of false-blocks, normal week</th>
+<th>Share, 20–21 Oct</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R11 Intent mismatch</td>
+<td>34%</td>
+<td><strong>71%</strong></td>
+</tr>
+<tr>
+<td>R13 Price anomaly</td>
+<td>22%</td>
+<td>14%</td>
+</tr>
+<tr>
+<td>R12 Quantity spike</td>
+<td>18%</td>
+<td>9%</td>
+</tr>
+<tr>
+<td>Others</td>
+<td>26%</td>
+<td>6%</td>
+</tr>
+</tbody>
+</table></div>
+<p>R11 dominates, concentrated in 3 quick-commerce merchants and in items with category "Gifting/Festive".</p>
+<p><strong>Step 6: Hypothesis.</strong> Festive bundle SKUs are new, so they're missing from the reference catalog and tagged with a new "Gifting" category. A grocery Rekha's intent ("weekly groceries") doesn't map to "Gifting", so Intent Lock scores them low even when the bundle is mostly groceries (dry fruits, sweets).</p>
+<p><strong>Step 7: Validate.</strong> Pull 200 R11 false-blocks: 168 (84%) contain at least one SKU created after 15 Oct with category "Gifting". Hypothesis confirmed.</p>
+<p><strong>Step 8: Fix now, fix properly, prevent.</strong>
+- <strong>Now (hours):</strong> for registered agents at allow-listed merchants, temporarily treat "Gifting" items whose components map to the Rekha's categories as in-scope, capped at the Rekha budget. Send a clear in-app note to affected users.
+- <strong>Properly (days):</strong> ingest merchants' festive catalogs 7 days ahead; map bundles to component categories.
+- <strong>Prevent (process):</strong> add a "festive calendar" to the risk ops runbook (Diwali, Holi, Eid, Christmas, big sale days); run shadow-mode checks on new catalog categories before they go live.
+- <strong>Guardrail check:</strong> confirm R14 (payee mismatch) and R05 (P2P) are untouched. Festive season is also scam season, and the fix must not loosen hard rules.</p>
+<p><strong>Takeaway:</strong> structure (data → internal → external → segment → hypothesis → validate → fix/prevent) beats guessing, and every fix is checked against a guardrail.</p>
+<hr>
+<h2 id="10-a-second-shorter-example">10. A second, shorter example</h2>
+<blockquote>
+<p>"Rekha creation rate in week 1 fell from 38% to 27% after the partner app's 4.12 release."</p>
+</blockquote>
+<p>The same method, compressed:
+- Data: did the <code>rekha_created</code> event change name or move to a different screen?
+- Internal: did 4.12 move the builder entry point? Change the default template? Add a PIN step earlier?
+- Segment: Android vs iOS, app version, language, new vs existing users, agent type.
+- Likely cause in this kind of case: an entry point moved below the fold, or a new mandatory step (such as PIN before preview) added friction.
+- Validate: funnel by step, by app version, in the week before and after.</p>
+<nav class="pager" aria-label="Documents">
+  <span><a href="02_PRD.html">← PRD</a></span><span><a href="04_Strategy_and_GTM.html">Strategy &amp; GTM →</a></span>
+</nav>
+<p class="foot">Rekha is a concept case study by Abhishek Kumar. Market facts are cited; sizing and targets are labelled assumptions.</p>
+</article>
+</main>
+</body>
+</html>

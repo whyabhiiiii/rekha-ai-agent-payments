@@ -1,0 +1,866 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Discovery &amp; Research · Rekha</title>
+<meta name="description" content="Discovery &amp; Research: part of Rekha, a product case study on spending limits for AI agents on UPI, by Abhishek Kumar.">
+<meta property="og:title" content="Discovery &amp; Research · Rekha">
+<meta property="og:image" content="https://whyabhiiiii.github.io/rekha-ai-agent-payments/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%235B3CC4'/%3E%3Cpath d='M12 42C24 26 40 22 52 24' fill='none' stroke='white' stroke-width='6' stroke-linecap='round'/%3E%3Ccircle cx='12' cy='42' r='5' fill='white'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&family=Rozha+One&display=swap">
+<style>
+/* Layout: a single reading column pinned to the same violet margin rule as the case study. */
+:root {
+  --paper: #F6F5FA; --surface: #FFFFFF; --ink: #17162B; --muted: #5D5B73; --faint: #6A6783; --rule: #E2E0EC;
+  --line: #5B3CC4; --line-ink: #4A2FB0; --line-soft: #EEEAFC;
+  --f-display: "Rozha One", "Noto Serif Devanagari", Georgia, serif;
+  --f-body: "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #121120; --surface: #1C1B2C; --ink: #ECEAF6; --muted: #A9A6C0; --faint: #908DA9; --rule: #2D2B42;
+    --line: #A792FF; --line-ink: #C4B6FF; --line-soft: #262046; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #121120; --surface: #1C1B2C; --ink: #ECEAF6; --muted: #A9A6C0; --faint: #908DA9; --rule: #2D2B42;
+  --line: #A792FF; --line-ink: #C4B6FF; --line-soft: #262046; color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 17px/1.65 var(--f-body); }
+a { color: var(--line-ink); text-underline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--line); outline-offset: 2px; }
+.top { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; justify-content: space-between;
+  padding: 14px max(16px, 4vw); border-bottom: 1px solid var(--rule); background: var(--paper); position: sticky; top: env(safe-area-inset-top, 0px); z-index: 2; }
+.mark { display: inline-flex; align-items: baseline; gap: 8px; text-decoration: none; color: var(--ink); }
+.mark .dev { font-family: var(--f-display); font-size: 26px; line-height: 1; border-bottom: 3px solid var(--line); }
+.mark .lat { font-family: var(--f-display); font-size: 18px; }
+.top nav { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 14.5px; font-weight: 600; }
+.top nav a { text-decoration: none; }
+.top nav a:hover { text-decoration: underline; }
+.wrap { max-width: 980px; margin: 0 auto; padding: 32px max(16px, 4vw) 64px; }
+article { border-left: 2px solid var(--line); padding-left: clamp(16px, 4vw, 40px); min-width: 0; }
+article > * { max-width: 72ch; }
+article > .tw, article > pre, article > .mermaid-wrap { max-width: none; }
+h1 { font-family: var(--f-display); font-weight: 400; font-size: clamp(32px, 5vw, 48px); line-height: 1.08; margin: 0 0 18px; text-wrap: balance; }
+h2 { font-family: var(--f-display); font-weight: 400; font-size: clamp(25px, 3.4vw, 32px); line-height: 1.15; margin: 44px 0 12px; text-wrap: balance; }
+h3 { font-size: 19px; margin: 28px 0 8px; }
+h4 { font-size: 16px; margin: 20px 0 6px; }
+p, li { margin: 0 0 12px; }
+ul, ol { padding-left: 22px; margin: 0 0 14px; }
+hr { border: 0; border-top: 1px solid var(--rule); margin: 32px 0; }
+blockquote { margin: 0 0 16px; padding: 10px 16px; border-left: 4px solid var(--line); background: var(--line-soft); border-radius: 0 12px 12px 0; }
+blockquote p:last-child { margin-bottom: 0; }
+code { font-family: var(--f-mono); font-size: .86em; background: var(--line-soft); color: var(--line-ink); padding: 1px 5px; border-radius: 5px; }
+pre { background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; padding: 14px 16px; overflow-x: auto; margin: 0 0 16px; }
+pre code { background: none; color: var(--ink); padding: 0; font-size: 13.5px; line-height: 1.55; }
+.tw { overflow-x: auto; border: 1px solid var(--rule); border-radius: 12px; background: var(--surface); margin: 0 0 18px; }
+table { width: 100%; border-collapse: collapse; font-size: 14.5px; min-width: 560px; }
+th { text-align: left; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; padding: 10px 12px; border-bottom: 1px solid var(--rule); }
+td { padding: 9px 12px; border-top: 1px solid var(--rule); vertical-align: top; }
+tr:first-child td { border-top: 0; }
+.mermaid-wrap { background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; padding: 16px; overflow-x: auto; margin: 0 0 18px; }
+pre.mermaid { border: 0; padding: 0; margin: 0; background: none; overflow: visible; }
+pre.mermaid svg { display: block; margin-inline: auto; }
+/* trees (opportunity tree, metric tree): nested lists drawn with connector lines */
+ul.tree { list-style: none; padding: 14px 16px; margin: 0 0 18px; max-width: none; background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; font-size: 15.5px; }
+ul.tree ul { list-style: none; margin: 8px 0 4px 6px; padding-left: 18px; border-left: 2px solid var(--line-soft); }
+ul.tree li { margin: 0 0 6px; line-height: 1.5; }
+ul.tree > li > ul > li { margin-bottom: 12px; }
+ul.tree em { color: var(--muted); font-size: .93em; }
+.pager { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 48px; padding-top: 18px; border-top: 1px solid var(--rule); font-weight: 600; }
+.foot { margin-top: 24px; font-size: 13.5px; color: var(--faint); }
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="mark" href="../index.html"><span class="dev" lang="hi">रेखा</span><span class="lat">Rekha</span></a>
+  <nav aria-label="Project">
+    <a href="../index.html">Case study</a>
+    <a href="../prototype.html">Prototype</a>
+    <a href="../index.html#docs">All documents</a>
+  </nav>
+</header>
+<main class="wrap">
+<article>
+<h1 id="01-discovery-and-research">01 · Discovery and Research</h1>
+<ul>
+<li><strong>Product:</strong> Rekha (रेखा, "line"): draw the line for your AI agents.</li>
+<li><strong>Stage:</strong> Problem discovery is complete from secondary research. Primary research (interviews, survey, usability tests) is designed in <code>06_Validation_Plan.md</code> and is the next step.</li>
+<li><strong>How to read this:</strong> every user-level claim is labelled <strong>[Evidence]</strong> (a published source) or <strong>[Hypothesis]</strong> (still to be tested with users).</li>
+<li><strong>Last updated:</strong> 17 November 2026.</li>
+</ul>
+<hr>
+<h2 id="1-problem-statement">1. Problem statement</h2>
+<blockquote>
+<p>AI agents in India can now pay over UPI, but the only control a user gets is a <strong>monthly amount cap</strong>. A cap limits <em>how much</em> an agent can lose. It says nothing about <em>what</em> the agent is allowed to buy, <em>from whom</em>, or <em>whether this payment matches what I actually asked for</em>. So most people won't let agents pay at all, and the ones who do are exposed to mistakes and manipulation that a cap can't catch.</p>
+</blockquote>
+<p><strong>The trust gap in one line [Evidence]:</strong> 74% of consumers are open to an AI agent completing specific shopping tasks for them. Only <strong>9%</strong> are open to it buying on its own, even with guardrails they set themselves (Accenture, <em>Talk to my AI agent</em>, Consumer Pulse 2026: 25,590 consumers in 16 countries, surveyed January 2026).</p>
+<p><strong>Rekha's thesis [Hypothesis]:</strong> the 9% were already offered guardrails in the abstract, so a promise of guardrails is not enough. Rekha's bet is that the gap narrows when three things are true. First, controls work at the level people think in (intent: <em>"weekly groceries, under ₹2,500, from these two apps, no alcohol"</em>) instead of the level the rails think in (amount: <em>"₹15,000 per month"</em>). Second, people can see each check and undo a mistake. Third, autonomy is earned on small, low-risk purchases. Accenture's data points the same way: 31% say low-cost, low-risk purchases would make them more comfortable.</p>
+<hr>
+<h2 id="2-why-now-the-20242026-timeline">2. Why now: the 2024–2026 timeline</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>When</th>
+<th>What happened</th>
+<th>Why it matters for Rekha</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2024</td>
+<td>NPCI launches <strong>UPI Circle</strong>: delegate payments to a secondary user (full delegation capped at ₹15,000/month and ₹5,000/transaction)</td>
+<td>Delegation rail exists, but it was designed for family members, not software</td>
+</tr>
+<tr>
+<td>Sep 2025</td>
+<td>Google announces <strong>AP2</strong> (Agent Payments Protocol) with Intent, Cart and Payment mandates, 60+ partners</td>
+<td>Industry converging on "bind the payment to the user's intent", which is Rekha's core idea</td>
+</tr>
+<tr>
+<td>Oct 2025</td>
+<td><strong>NPCI × OpenAI × Razorpay</strong> pilot agentic UPI payments in ChatGPT (Axis Bank, Airtel Payments Bank; BigBasket among first merchants)</td>
+<td>Agent payments in India are real, starting with groceries</td>
+</tr>
+<tr>
+<td>Nov 2025</td>
+<td><strong>DPDP Rules 2025</strong> notified (13 Nov); phased to May 2027</td>
+<td>Intent and cart data is personal data; privacy-by-design is mandatory</td>
+</tr>
+<tr>
+<td>Feb 2026</td>
+<td><strong>Razorpay × NPCI</strong> launch agentic UPI checkout on Anthropic's <strong>Claude</strong> (pilot; Zomato, Swiggy, Zepto)</td>
+<td>A second AI assistant gets UPI checkout; food and quick commerce lead</td>
+</tr>
+<tr>
+<td>Feb 2026</td>
+<td>ChatGPT reaches <strong>100M weekly active users in India</strong>, its second-largest market</td>
+<td>A large, agent-ready user base exists</td>
+</tr>
+<tr>
+<td>Mar 2026</td>
+<td><strong>Mastercard and Google publish Verifiable Intent</strong>: an open standard that records who the agent is, what the user asked for and what was bought</td>
+<td>The card world is converging on proof of intent. Nothing equivalent exists for a UPI user.</td>
+</tr>
+<tr>
+<td>Mar 2026</td>
+<td><strong>Razorpay Agent Studio</strong>; <strong>Cashfree Here</strong> (with Mastercard, Swiggy)</td>
+<td>Merchant and payment-gateway side is being built fast</td>
+</tr>
+<tr>
+<td>Apr 2026</td>
+<td><strong>RBI discussion paper</strong> on digital-payment fraud safeguards: cooling-off periods, trusted-person approval for vulnerable users, <strong>customer-set limits and a kill switch</strong></td>
+<td>The regulator is asking for exactly the controls Rekha provides</td>
+</tr>
+<tr>
+<td>Jun 2026</td>
+<td><strong>Pine Labs P3P goes live</strong>: AI agents complete UPI payments after a single upfront authorisation, using one-time mandates and Reserve Pay</td>
+<td>Agents can already pay today. The only user control is the size of the mandate.</td>
+</tr>
+<tr>
+<td>Jun 2026</td>
+<td>Accenture consumer study: 85% / 74% / 32% / 9% across four levels of agent autonomy</td>
+<td>Quantifies the trust gap, and shows that offering guardrails alone doesn't close it</td>
+</tr>
+<tr>
+<td>Jun 2026</td>
+<td>RBI issues final bank directions on digital-fraud conduct and compensation, effective <strong>1 Jan 2027</strong></td>
+<td>Customer-protection obligations on banks arrive in 2027</td>
+</tr>
+<tr>
+<td>Aug 2026</td>
+<td>UPI hits a record <strong>24.51 billion</strong> transactions in a month; turns 10</td>
+<td>Scale of the rail</td>
+</tr>
+<tr>
+<td><strong>Sep 2026</strong></td>
+<td><strong>NPCI's agent-payments launch is paused.</strong> Reuters (1 Sep) reported a Unified Agent Protocol (also written "Unified Agentic Protocol"): small agent payments without per-payment approval, user-set rules and limits, built on UPI Circle and Reserve Pay, with an agent registry. Business Standard (11 Sep) then reported the launch was put on hold pending regulatory clearance, with user protection and liability the open questions. Neither NPCI nor RBI has confirmed details on the record.</td>
+<td>Safeguards are the gating item. The user-side control layer and the dispute story are exactly what is missing.</td>
+</tr>
+<tr>
+<td>10 Sep 2026</td>
+<td>Visa, Mastercard and Ant International start work on shared "Know Your Agent" principles</td>
+<td>Networks are standardising how agents are identified, not what users can control</td>
+</tr>
+<tr>
+<td>11 Sep 2026</td>
+<td><strong>Visa</strong> launches agentic commerce experiences in India with banks and major payment gateways</td>
+<td>Card networks are moving too; the market will be multi-rail</td>
+</tr>
+<tr>
+<td>25 Sep 2026</td>
+<td>Razorpay, Cashfree, BharatPe, PayU launch agentic AI suites</td>
+<td>Supply side is crowded; the consumer trust side isn't</td>
+</tr>
+<tr>
+<td>Oct 2026</td>
+<td>UPI's record month: <strong>25.47 billion</strong> transactions, ₹31.53 lakh crore. NPCI defers a planned <strong>0.4% MDR</strong> on select merchant payments above ₹2,000; no new start date as of mid-November</td>
+<td>Scale keeps growing; most small merchant payments stay free, which shapes "who pays"</td>
+</tr>
+<tr>
+<td>Nov 2026</td>
+<td>DPDP consent-manager framework in force (13 Nov). CERT-In guidance on agentic AI reportedly covers permissions, delegation, logging and emergency stops</td>
+<td>Consent, revocation and kill switches become standard expectations</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>The window:</strong> agents can already pay over UPI (P3P, in-chat pilots). The official protocol to scale it is paused while safeguards are worked out, and RBI has publicly asked for customer-set limits and kill switches. The first UPI app to show credible agent controls and dispute evidence is best placed to launch, and can shape the protocol while it is still being designed.</p>
+<hr>
+<h2 id="3-market-facts">3. Market facts</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Fact</th>
+<th>Value</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UPI users onboarded</td>
+<td>55.49 crore (June 2026)</td>
+<td>Ministry of Finance reply, via CA Club India</td>
+</tr>
+<tr>
+<td>UPI volume, Oct 2026 (record)</td>
+<td>25.47 billion transactions, ₹31.53 lakh crore; ~822M/day; average daily value above ₹1 lakh crore for the first time</td>
+<td>NPCI data via Free Press Journal / Entrepreneur India</td>
+</tr>
+<tr>
+<td>UPI merchant fees</td>
+<td>0.4% MDR planned on select merchant payments above ₹2,000 from 15 Oct 2026, then deferred; no new start date as of 16 Nov 2026. P2P transfers, merchant payments up to ₹2,000 and small merchants stay free (more than 95% of merchant payments)</td>
+<td>The Week; SCC Online; MediaNama</td>
+</tr>
+<tr>
+<td>UPI volume, FY2025-26</td>
+<td>24,161.69 crore transactions, ₹314.23 lakh crore</td>
+<td>Ministry of Finance, via CA Club India</td>
+</tr>
+<tr>
+<td>ChatGPT weekly users in India</td>
+<td>100 million (Feb 2026)</td>
+<td>Sam Altman, via Social Samosa</td>
+</tr>
+<tr>
+<td>Consumers open to working with an agent to find the best option</td>
+<td>85%</td>
+<td>Accenture 2026</td>
+</tr>
+<tr>
+<td>…to an agent completing specific shopping tasks on request</td>
+<td>74%</td>
+<td>Accenture 2026</td>
+</tr>
+<tr>
+<td>…to an agent deciding what to buy while they make the payment</td>
+<td>32%</td>
+<td>Accenture 2026</td>
+</tr>
+<tr>
+<td>…to an agent buying on its own, with guardrails they set</td>
+<td>9%</td>
+<td>Accenture 2026</td>
+</tr>
+<tr>
+<td>…who say low-cost, low-risk purchases would make them more comfortable</td>
+<td>31%</td>
+<td>Accenture 2026</td>
+</tr>
+<tr>
+<td>US online adults trusting agents for routine purchases</td>
+<td>24% (Mar 2025)</td>
+<td>Forrester</td>
+</tr>
+<tr>
+<td>UPI fraud, FY2024-25</td>
+<td>12.64 lakh cases, ₹981 crore</td>
+<td>Ministry of Finance in Lok Sabha</td>
+</tr>
+<tr>
+<td>Prompt-injection attacks on web agents</td>
+<td>"partially succeeded in 86% of cases" (Meta research)</td>
+<td>The Register, Oct 2025</td>
+</tr>
+<tr>
+<td>Agentic commerce by 2030 (global)</td>
+<td>$3–5 trillion (McKinsey); US agentic GMV $190–385B (Morgan Stanley)</td>
+<td>Digital Commerce 360; Yahoo Finance</td>
+</tr>
+<tr>
+<td>Quick commerce, India</td>
+<td>~7.8M orders/day; ~₹11,000 crore GMV in one month in early 2026</td>
+<td>Digital in Asia</td>
+</tr>
+<tr>
+<td>UPI Circle limits</td>
+<td>Full delegation: ₹15,000/month, ₹5,000/transaction; up to 5 delegates</td>
+<td>PhonePe Business; Ujjivan SFB</td>
+</tr>
+<tr>
+<td>Reserve Pay</td>
+<td>Funds blocked for multiple debits (cap ₹10,000, up to 90 days; may be revisited for agents)</td>
+<td>Reuters via The Star</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2 id="4-existing-product-teardown-why-todays-tools-break-for-agents">4. Existing-product teardown: why today's tools break for agents</h2>
+<p>This is the "existing product" half of the project: an analysis of what already exists, where it falls short for agents, and what Rekha borrows from each.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Existing tool</th>
+<th>What it does well</th>
+<th>Where it breaks for AI agents</th>
+<th>What Rekha keeps</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UPI Circle, full delegation</strong></td>
+<td>Lets someone else pay from your account within caps, no PIN each time</td>
+<td><strong>Amount-only.</strong> It can't express "groceries only" or "not to a new person". One cap covers everything the delegate does. You only see what happened afterwards.</td>
+<td>The rail and its caps; Rekha sub-divides them</td>
+</tr>
+<tr>
+<td><strong>UPI Circle, partial delegation</strong></td>
+<td>Every payment needs the primary user's PIN</td>
+<td>Safe but defeats automation. Approving everything leads to <strong>approval fatigue</strong>: people approve without reading (the same failure as MFA "push bombing" in security)</td>
+<td>Step-up approval, but <em>only when something is unusual</em></td>
+</tr>
+<tr>
+<td><strong>Reserve Pay</strong></td>
+<td>Blocks funds once, allows multiple debits</td>
+<td>Tied to one merchant relationship; agents shop across many merchants</td>
+<td>Budget envelopes</td>
+</tr>
+<tr>
+<td><strong>UPI AutoPay (e-mandates)</strong></td>
+<td>Recurring payments to a fixed merchant</td>
+<td>Fixed merchant, fixed/max amount; one mandate per relationship; can't handle open-ended shopping</td>
+<td>Bill-pay Rekhas use the same mental model</td>
+</tr>
+<tr>
+<td><strong>In-chat checkout</strong> (e.g. ChatGPT × Razorpay pilot)</td>
+<td>Smooth: discover, decide and pay inside the conversation</td>
+<td><strong>Controls live inside the agent's own product</strong>, so the agent marks its own homework. Three agents mean three separate control panels and no single view of what all your agents spent.</td>
+<td>Seamless checkout as the default path</td>
+</tr>
+<tr>
+<td><strong>Bank card controls</strong></td>
+<td>On/off, channel limits</td>
+<td>Card-level, not agent-level; no idea what was bought</td>
+<td>Kill switch</td>
+</tr>
+<tr>
+<td><strong>Google AP2</strong></td>
+<td>Signed <em>intent</em> mandate + <em>cart</em> mandate that must match: the right idea</td>
+<td>A developer protocol, not a consumer product; global and card-first; adoption depends on agent platforms</td>
+<td>Intent-to-cart matching (Rekha's "Intent Lock")</td>
+</tr>
+<tr>
+<td><strong>Mastercard Verifiable Intent</strong> (cards, Mar 2026)</td>
+<td>A signed record linking who the agent is, what was asked and what was bought</td>
+<td>Card rails; built for networks, issuers and developers, not a control a UPI user sets in their own app</td>
+<td>Proof of intent, kept for disputes</td>
+</tr>
+<tr>
+<td><strong>Pine Labs P3P</strong> (live, Jun 2026)</td>
+<td>Agent pays after one upfront authorisation (one-time mandate / Reserve Pay)</td>
+<td>After that single approval, the <strong>mandate amount is the only check</strong>. It sits on the merchant/gateway side, so it can't see your other agents.</td>
+<td>Upfront approval, but scoped per purpose</td>
+</tr>
+<tr>
+<td><strong>NPCI Unified Agent Protocol</strong> (launch paused)</td>
+<td>Planned agent registry, delegated limits, interoperability, settlement finality</td>
+<td>Will define the rail and rules; leaves <strong>user experience and dispute evidence</strong> to apps; needs RBI approval; liability still open</td>
+<td>Registry lookups ("Verified agent" badge); the rail's limits as the outer boundary</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Synthesis:</strong> on UPI, every existing tool controls <em>amount</em> or <em>merchant</em>. None controls <em>intent</em>. The work that comes closest (AP2 and Mastercard's Verifiable Intent on cards, in-chat checkout) sits with networks, developers and agents. <strong>The user's side, inside the UPI app, is still empty.</strong></p>
+<hr>
+<h2 id="5-users">5. Users</h2>
+<h3 id="segments">Segments</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Segment</th>
+<th>Size signal</th>
+<th>Primary job</th>
+<th>Rekha priority</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Urban AI-native delegators</strong> (22–40, metro, daily AI-assistant users, frequent quick-commerce users)</td>
+<td>Overlap of 100M ChatGPT WAU and frequent online shoppers</td>
+<td>Offload routine purchases</td>
+<td><strong>Beachhead (pilot)</strong></td>
+</tr>
+<tr>
+<td><strong>Family guardians</strong> (25–45, manage parents' digital life)</td>
+<td>Large; the "tech person" in most Indian families</td>
+<td>Let parents benefit from agents safely</td>
+<td>Phase 2</td>
+</tr>
+<tr>
+<td><strong>Cautious bill-payers</strong> (45+, tier-1/2, have seen UPI scams)</td>
+<td>Large, lower AI adoption today</td>
+<td>Never miss a bill, never get cheated</td>
+<td>Phase 2 (via guardians)</td>
+</tr>
+<tr>
+<td><strong>Small merchants / sole proprietors</strong></td>
+<td>Very large</td>
+<td>Agent pays vendors, utilities</td>
+<td>Later (business Rekhas)</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Beachhead rationale:</strong> the delegators already use agents and already shop online weekly, so the value of Rekha shows within days. They're also the most likely early users of today's agent checkouts and of any UAP pilot.</p>
+<h3 id="proto-personas-hypothesis-validate-with-interviews">Proto-personas <strong>[Hypothesis, validate with interviews]</strong></h3>
+<p><strong>Priya, 29, product designer, Bengaluru: "The Delegator"</strong>
+- Uses an AI assistant daily; orders groceries on quick commerce 3×/week; pays 6 bills a month.
+- <em>Wants:</em> "I want my weekly groceries and bills to just happen."
+- <em>Fears:</em> the agent orders 10 kg instead of 1 kg; a fake "discount" page tricks it; she won't notice until the bank SMS.
+- <em>Current workaround:</em> lets the agent build the cart, then pays manually. Saves maybe 30% of the effort.</p>
+<p><strong>Rajesh, 54, shop owner, Lucknow: "The Cautious Bill-Payer"</strong>
+- Uses UPI daily for business; has been targeted by "refund" scam calls; his son set up most of his apps.
+- <em>Wants:</em> electricity, gas and phone recharges paid on time without remembering dates.
+- <em>Fears:</em> "Someone will empty my account and the bank will say I authorised it."
+- <em>Current workaround:</em> son pays some bills from his own phone; occasional late fees.</p>
+<p><strong>Arjun, 34, IT manager, Gurugram: "The Family Guardian"</strong>
+- Manages his parents' (in Kanpur) phones, bills and medicine orders remotely.
+- <em>Wants:</em> parents' assistant can reorder medicines and pay bills; he sees everything and can stop anything.
+- <em>Fears:</em> parents approving something they don't understand.
+- <em>Current workaround:</em> parents call him before every online payment.</p>
+<p><strong>B2B stakeholders (Rekha ships inside a UPI app, so these matter as much as end users):</strong>
+- <strong>Head of Payments Product at a UPI app:</strong> wants agent-commerce share without becoming the face of an agent fraud scandal.
+- <strong>Fraud/risk lead at a PSP bank:</strong> wants lower dispute volume and clear evidence when agents go wrong.
+- <strong>Agent developer:</strong> wants high payment success with minimal friction, and a "verified" signal that increases user trust.
+- <strong>Merchant (quick commerce):</strong> wants agent orders to convert, without chargebacks or disputes.</p>
+<h3 id="jobs-to-be-done">Jobs To Be Done</h3>
+<p><strong>Core job [Hypothesis]</strong></p>
+<blockquote>
+<p>When I hand a routine purchase to an AI agent, I want to set exactly how far it can go, so I can stop thinking about it without worrying that it will overspend, be tricked, or buy the wrong thing.</p>
+</blockquote>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Job type</th>
+<th>Job statement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Functional</td>
+<td>Get routine purchases and bills done without my attention</td>
+</tr>
+<tr>
+<td>Functional</td>
+<td>Know at a glance what every agent spent, where, and why</td>
+</tr>
+<tr>
+<td>Functional</td>
+<td>Undo or dispute a wrong agent payment quickly</td>
+</tr>
+<tr>
+<td>Emotional</td>
+<td>Feel in control; not feel foolish for trusting a bot</td>
+</tr>
+<tr>
+<td>Social</td>
+<td>Be the responsible one who protects the family's money</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Competing solutions for the job ("what do people hire today?"):</strong> paying manually; letting the agent build the cart and paying yourself; asking a family member; AutoPay for fixed bills; not using agents at all. The last one, <em>not using agents</em>, is the real competitor.</p>
+<hr>
+<h2 id="6-pain-points-and-opportunities">6. Pain points and opportunities</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>Opportunity (user need)</th>
+<th>Evidence level</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>O1</td>
+<td>"I don't know what my agent is allowed to do." Controls are unclear or amount-only.</td>
+<td>[Evidence] UPI Circle limits and the reported UAP design are amount-based; [Hypothesis] users feel this</td>
+</tr>
+<tr>
+<td>O2</td>
+<td>"I'm scared it'll be tricked." Fear of manipulation and fraud.</td>
+<td>[Evidence] Prompt-injection research; UPI fraud scale; Acosta: top concerns include unapproved purchases and fraud</td>
+</tr>
+<tr>
+<td>O3</td>
+<td>"If it messes up, I'm stuck." No clear undo or dispute path.</td>
+<td>[Evidence] UAP liability regime under discussion; [Hypothesis] user concern</td>
+</tr>
+<tr>
+<td>O4</td>
+<td>"Too many approval pings and I stop reading them."</td>
+<td>[Evidence] MFA-fatigue analogue in security; [Hypothesis] for payments</td>
+</tr>
+<tr>
+<td>O5</td>
+<td>"My parents can't manage this safely."</td>
+<td>[Evidence] RBI proposal: trusted-person approval for vulnerable users; [Hypothesis] demand</td>
+</tr>
+<tr>
+<td>O6</td>
+<td>"I'd trust it more once I've seen it work."</td>
+<td>[Evidence] Accenture: 31% say low-cost, low-risk purchases would make them more comfortable</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2 id="7-opportunity-solution-tree">7. Opportunity Solution Tree</h2>
+<ul class="tree">
+<li><strong>Outcome:</strong> more routine purchases completed by agents without per-payment approval, with fraud and disputes at or below baseline<ul>
+<li><strong>O1 · Unclear controls</strong><ul>
+<li>Plain-language Rekha builder that produces a structured policy card. <em>Test: plain-language builder against a form.</em></li>
+<li>Autonomy ladder, L0 to L3, with safe presets</li>
+</ul>
+</li>
+<li><strong>O2 · Fear of being tricked</strong><ul>
+<li>Intent Lock: the cart must match the intent. <em>Test: Intent Lock in shadow mode on pilot traffic.</em></li>
+<li>Injection Shield: payee, price and provenance checks</li>
+<li>Verified-agent badge from the NPCI registry</li>
+</ul>
+</li>
+<li><strong>O3 · No way back</strong><ul>
+<li>Kill switch: pause every agent in one tap</li>
+<li>One-tap dispute with an automatic evidence pack</li>
+<li>Cooling window for first-time payees</li>
+</ul>
+</li>
+<li><strong>O4 · Approval fatigue</strong><ul>
+<li>Step-up only on anomalies, with the reason first</li>
+<li>Trust Ramp: autonomy earned after clean payments. <em>Test: Trust Ramp nudge.</em></li>
+<li>Weekly agent digest</li>
+</ul>
+</li>
+<li><strong>O5 · Vulnerable family members</strong><ul>
+<li>Family Rekha: guardian co-approval</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="8-assumption-map">8. Assumption map</h2>
+<p>Risk = importance if wrong × how little evidence we have. Test the top-right first.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>Assumption</th>
+<th>Risk type</th>
+<th>Importance</th>
+<th>Evidence today</th>
+<th>Test</th>
+<th>Pass signal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A1</td>
+<td>AI-assistant users <em>want</em> agents to pay for routine purchases</td>
+<td>Value</td>
+<td>High</td>
+<td>Medium (Accenture 32%)</td>
+<td>Survey (n ≥ 150) + 8 interviews</td>
+<td>≥ 30% of AI users say they'd delegate at least one category with controls</td>
+</tr>
+<tr>
+<td>A2</td>
+<td>Fear of mistakes/fraud, not lack of need, is the main blocker</td>
+<td>Value</td>
+<td>High</td>
+<td>Medium</td>
+<td>Interviews: ask about the last time they <em>didn't</em> let an agent pay</td>
+<td>≥ 5 of 8 cite control or safety</td>
+</tr>
+<tr>
+<td>A3</td>
+<td>Users can set up a Rekha in under 90 seconds</td>
+<td>Usability</td>
+<td>High</td>
+<td>None</td>
+<td>Prototype usability test (5–6 users)</td>
+<td>≥ 80% task success, median &lt; 90 s</td>
+</tr>
+<tr>
+<td>A4</td>
+<td>Users understand step-up reasons and decide correctly</td>
+<td>Usability</td>
+<td>High</td>
+<td>None</td>
+<td>Usability test with seeded "bad" payments</td>
+<td>≥ 90% correct reject on seeded attacks</td>
+</tr>
+<tr>
+<td>A5</td>
+<td>Agent platforms will share intent and decision trace</td>
+<td>Feasibility</td>
+<td>High</td>
+<td>Low</td>
+<td>3 expert interviews with agent developers; read UAP and AP2 specs</td>
+<td>Specs or devs support passing intent + cart</td>
+</tr>
+<tr>
+<td>A6</td>
+<td>A UPI app or PSP bank sees strategic value</td>
+<td>Viability</td>
+<td>High</td>
+<td>Medium (RBI direction, UAP)</td>
+<td>3 expert interviews with fintech PMs</td>
+<td>≥ 2 say "we'd prioritise this in 2027"</td>
+</tr>
+<tr>
+<td>A7</td>
+<td>Decisions can be made in &lt; 300 ms p95</td>
+<td>Feasibility</td>
+<td>Medium</td>
+<td>Medium (rules are cheap; LLM kept off the hot path)</td>
+<td>Engineering spike</td>
+<td>Benchmark</td>
+</tr>
+<tr>
+<td>A8</td>
+<td>Users will accept a cooling window for first-time payees</td>
+<td>Usability</td>
+<td>Medium</td>
+<td>Low</td>
+<td>Survey preference question</td>
+<td>≥ 60% accept for amounts &gt; ₹2,000</td>
+</tr>
+<tr>
+<td>A9</td>
+<td>Guardians will set up Family Rekha for parents</td>
+<td>Value</td>
+<td>Medium</td>
+<td>Low</td>
+<td>4 guardian interviews</td>
+<td>≥ 3 would set up within a week</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2 id="9-competitive-landscape">9. Competitive landscape</h2>
+<h3 id="map-by-layer">Map by layer</h3>
+<pre><code> USER'S SIDE  │  Rekha  ← intent-level controls, cross-agent view, disputes, kill switch
+──────────────┼──────────────────────────────────────────────────────────────────────
+ AGENT        │  ChatGPT, Gemini, assistants with in-chat checkout (each controls only itself)
+ PROTOCOLS    │  Google AP2 · Mastercard Verifiable Intent · OpenAI/Stripe ACP · Pine Labs Grantex · NPCI UAP (paused)
+ NETWORKS     │  UPI (UPI Circle, Reserve Pay, AutoPay) · Visa Trusted Agent Protocol · Mastercard Agent Pay
+ MERCHANT/PG  │  Pine Labs P3P (live) · Razorpay Agentic Payments &amp; Agent Studio · Cashfree Here · PayU · Juspay
+</code></pre>
+<h3 id="comparison">Comparison</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Player</th>
+<th>Layer</th>
+<th>Intent-aware?</th>
+<th>Cross-agent view?</th>
+<th>User-side?</th>
+<th>India UPI?</th>
+<th>Threat to Rekha</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NPCI UAP (launch paused)</td>
+<td>Rail + registry</td>
+<td>No (limits)</td>
+<td>N/A</td>
+<td>Partly (sets limits)</td>
+<td>Yes</td>
+<td><strong>Tailwind</strong>: defines the outer boundary Rekha works within</td>
+</tr>
+<tr>
+<td>UPI Circle</td>
+<td>Rail</td>
+<td>No</td>
+<td>No</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Base layer</td>
+</tr>
+<tr>
+<td>Google AP2</td>
+<td>Protocol</td>
+<td><strong>Yes</strong></td>
+<td>No</td>
+<td>No (developer)</td>
+<td>Not yet</td>
+<td>Complement; Rekha can consume AP2 mandates</td>
+</tr>
+<tr>
+<td>OpenAI/Stripe ACP</td>
+<td>Merchant protocol</td>
+<td>Partly</td>
+<td>No</td>
+<td>No</td>
+<td>Limited</td>
+<td>Complement</td>
+</tr>
+<tr>
+<td>In-chat checkout (ChatGPT etc.)</td>
+<td>Agent</td>
+<td>Partly</td>
+<td><strong>No</strong></td>
+<td>No (agent's side)</td>
+<td>Yes (pilot)</td>
+<td>Medium: "good enough" controls inside each agent</td>
+</tr>
+<tr>
+<td>Mastercard Agent Pay + Verifiable Intent (with Google, Mar 2026)</td>
+<td>Network (cards)</td>
+<td><strong>Yes</strong> (signed record of identity, intent and action)</td>
+<td>No</td>
+<td>No (networks, issuers, developers; an issuer's app can revoke an agent)</td>
+<td>Cards</td>
+<td>Medium: it validates intent-matching. Rekha is the UPI, user-side version.</td>
+</tr>
+<tr>
+<td>Visa Trusted Agent Protocol (Oct 2025)</td>
+<td>Network (cards)</td>
+<td>No (verifies the agent to the merchant)</td>
+<td>No</td>
+<td>No</td>
+<td>Cards</td>
+<td>Low</td>
+</tr>
+<tr>
+<td>Visa × Mastercard × Ant "Know Your Agent" (Sep 2026)</td>
+<td>Networks</td>
+<td>No (agent identity and monitoring)</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+<td>Low; shows where standards are heading</td>
+</tr>
+<tr>
+<td>Pine Labs P3P + Grantex (live, Jun 2026)</td>
+<td>Merchant gateway + agent authorisation</td>
+<td>Partly (scoped permissions, expiry, mandate amount)</td>
+<td>No</td>
+<td>No (merchant side)</td>
+<td><strong>Yes</strong></td>
+<td><strong>Medium to high</strong>: the closest live product on UPI. No cross-agent view, and no check of the cart against what the user asked.</td>
+</tr>
+<tr>
+<td>Skyfire KYAPay</td>
+<td>Agent identity + payments (global)</td>
+<td>Partly (authorisation scope in the token)</td>
+<td>No</td>
+<td>No (developers, businesses)</td>
+<td>No</td>
+<td>Low</td>
+</tr>
+<tr>
+<td>Razorpay / Cashfree / PayU</td>
+<td>Merchant PG</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+<td>Yes</td>
+<td>Low: merchant-side</td>
+</tr>
+<tr>
+<td>UPI apps (PhonePe, Google Pay, Paytm…)</td>
+<td>Consumer app</td>
+<td>Not yet</td>
+<td>Possible</td>
+<td><strong>Yes</strong></td>
+<td>Yes</td>
+<td><strong>The natural owner.</strong> Rekha is designed to ship <em>inside</em> one of them.</td>
+</tr>
+</tbody>
+</table></div>
+<p><em>The card-network and startup rows rely on press coverage and company posts. I have not tested those products.</em></p>
+<h3 id="positioning-statement">Positioning statement</h3>
+<blockquote>
+<p><strong>For</strong> people who use AI agents for routine spending, <strong>who</strong> don't trust them with money yet, <strong>Rekha is</strong> an agent-permissions layer inside your UPI app <strong>that</strong> lets you set what each agent may buy, from whom and up to how much, and checks every payment against what you asked for. <strong>Unlike</strong> the limits inside each agent's own app or plain UPI caps, <strong>Rekha</strong> sits on your side, covers every agent in one place, and stops payments that don't match your intent.</p>
+</blockquote>
+<hr>
+<h2 id="10-key-insights-the-aha-moments">10. Key insights (the "aha" moments)</h2>
+<ol>
+<li><strong>The risk isn't how much. It's what.</strong> Caps limit damage; intent-matching prevents it. A prompt-injected agent can stay perfectly within a ₹15,000 cap while buying the wrong thing from the wrong merchant.</li>
+<li><strong>Agent-side controls have a conflict of interest.</strong> The platform that earns from completed purchases shouldn't be the only one deciding whether a purchase is OK.</li>
+<li><strong>"Human in the loop" fails when the loop is constant.</strong> Approval fatigue turns humans into rubber stamps. Ask rarely, ask clearly, and the human becomes a real safeguard again.</li>
+<li><strong>A promise of guardrails isn't enough; trust is earned.</strong> Accenture's 9% were already offered guardrails they set themselves. What helps is experience: 31% say low-cost, low-risk purchases would make them more comfortable. So Rekha starts agents small and lets them <em>earn</em> autonomy, which is where the Trust Ramp comes from.</li>
+<li><strong>People want a role, not a choice between all or nothing.</strong> Far more people are open to an agent deciding while they pay (32%) than to an agent buying alone (9%). Rekha's autonomy ladder gives them four positions, not two.</li>
+</ol>
+<hr>
+<h2 id="sources">Sources</h2>
+<ul>
+<li>Accenture, <em>Talk to my AI agent</em> (Consumer Pulse 2026): https://www.accenture.com/in-en/insights/consulting/talk-my-ai-agent</li>
+<li>Accenture Consumer Pulse 2026, full report (PDF): https://www.accenture.com/content/dam/accenture/final/accenture-com/document-fy26/q4/Accenture-Consumer-Pulse-2026.pdf</li>
+<li>UAP launch put on hold (Business Standard, 11 Sep 2026): https://www.business-standard.com/finance/news/upi-s-ai-protocol-temporarily-on-hold-as-npci-builds-safeguards-126091101413_1.html</li>
+<li>Mastercard Verifiable Intent (Mastercard, Mar 2026): https://www.mastercard.com/in/en/news-and-trends/stories/2026/verifiable-intent.html</li>
+<li>Ant International, Mastercard and Visa on Know Your Agent (The Asian Banker, 10 Sep 2026): https://www.theasianbanker.com/press-releases/ant-international-mastercard-and-visa-initiate-collaboration-on-know-your-agent-interoperability-to-scale-agentic-commerce</li>
+<li>Skyfire, <em>The trust gap in AI agent payments</em> (Mar 2026): https://skyfire.xyz/the-trust-gap-in-ai-agent-payments/</li>
+<li>Pine Labs on Grantex and the agent economy (YourStory, Nov 2026): https://yourstory.com/2026/11/how-pine-labs-is-building-for-the-agent-economy-cto-sanjeev-kumar-on-trust-control-and-execution</li>
+<li>NPCI's UPI MDR FAQs explained (SCC Online, 16 Sep 2026): https://www.scconline.com/blog/post/2026/09/16/npci-released-upi-mdr-faqs-explained/</li>
+<li>UPI MDR still pending; Vyapaar Saksham scheme (MediaNama, 16 Nov 2026): https://medianama.com/2026/11/223-npci-upi-mdr-vyapaar-saksham-scheme</li>
+<li>Forrester consumer pulse (US): https://www.forrester.com/report/many-us-consumers-believe-in-agentic-commerce-but-few-trust-it-to-make-purchases/RES188737</li>
+<li>Acosta-cited trust concerns, via Let's Data Science: https://letsdatascience.com/news/consumers-place-growing-trust-in-ai-shopping-agents-1e3ca4f7</li>
+<li>India preparing agentic payments on UPI (Reuters via The Star, 1 Sep 2026): https://www.thestar.com.my/tech/tech-news/2026/09/01/india-preparing-rollout-of-agentic-payments-on-upi-sources-say</li>
+<li>NPCI's GFF 2026 announcements (Inc42, 11 Sep 2026; UAP not among them): https://inc42.com/buzz/gff-2026-npci-unveils-unified-ticketing-takes-rupay-credit-card-on-upi-to-us-uae/</li>
+<li>NPCI agent framework coverage incl. chairman quote (CareerIndia): https://www.careerindia.com/news/ai-agent-upi-payments-npci-framework-fintech-hiring-trends-2026-011-65443.html</li>
+<li>UAP and RBI approval (Business Standard via Vision IAS): https://visionias.in/current-affairs/upsc-daily-news-summary/article/2026-07-09/business-standard/economy/india-may-allow-agentic-ai-led-upi-transactions-under-new-npci-protocol</li>
+<li>Pine Labs P3P launch (Pine Labs press release, Jun 2026): https://www.pinelabs.com/media-analyst/the-ai-agent-can-now-pay-pine-labs-launches-p3p-indias-first-agentic-payment-protocol-built-on-upi</li>
+<li>Razorpay × NPCI agentic payments on Claude (Razorpay newsroom, Feb 2026): https://razorpay.com/newsroom/razorpay-npci-launch-agentic-payments-on-claude-powering-zomato-swiggy-zepto-at-the-india-ai-impact-summit/</li>
+<li>UPI October 2026 record (Free Press Journal): https://www.freepressjournal.in/business/upi-transactions-hit-2547-billion-in-october-value-soars-to-3153-lakh-crore</li>
+<li>UPI MDR deferred until after Diwali (The Week, 13 Oct 2026): https://www.theweek.in/news/biz-tech/2026/10/13/npci-defers-upi-mdr-until-after-diwali.html</li>
+<li>RBI final digital-fraud directions, effective 1 Jan 2027 (Moneylife): https://moneylife.in/article/rbi-notifies-digital-fraud-compensation-rules-gives-banks-more-time-delays-rollout/80882.html</li>
+<li>CERT-In agentic AI audit guidance (Let's Data Science summary): https://letsdatascience.com/news/cert-in-issues-ai-security-auditing-guidelines-covering-agen-6e37b2b9</li>
+<li>NPCI agentic payments report (Inc42): https://inc42.com/?p=570783</li>
+<li>India preparing agentic payments on UPI (The Star / Reuters): https://www.thestar.com.my/tech/tech-news/2026/09/01/india-preparing-rollout-of-agentic-payments-on-upi-sources-say</li>
+<li>NPCI × OpenAI × Razorpay ChatGPT pilot (Storyboard18): https://storyboard18.com/digital/razorpay-npci-partner-with-openai-for-agentic-payments-on-chatgpt-82299.htm</li>
+<li>UPI Circle explained (PhonePe Business): https://business.phonepe.com/articles/upi-circle-what-it-is-how-it-works-and-who-can-use-it</li>
+<li>UPI Circle limits (Ujjivan SFB): https://www.ujjivansfb.bank.in/banking-blogs/banking-services/upi-circle-delegated-payments-how-it-works-limits</li>
+<li>UPI September 2026 data (StartupTalky): https://startuptalky.com/upi-transactions-september-2026/</li>
+<li>UPI August 2026 record (StartupTalky): https://startuptalky.com/india-upi-transactions-august-2026-record-volume/</li>
+<li>UPI users 55.49 crore and FY26 totals (CA Club India): https://www.caclubindia.com/news/upi-crosses-55-49-crore-users-in-june-2026-fy26-transactions-hit-rs-314-lakh-crore-26671.asp</li>
+<li>ChatGPT 100M weekly users in India (Social Samosa): https://www.socialsamosa.com/news-2/india-100-million-weekly-active-chatgpt-users-11121146</li>
+<li>UPI fraud FY25 (BOOM, Finance Ministry in Lok Sabha): https://www.boomlive.in/web-stories/india/upi-fraud-cases-and-losses-rise-over-five-years-finance-ministry-tells-lok-sabha-2755</li>
+<li>RBI discussion paper press release (Apr 2026): https://www.rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx?prid=62535</li>
+<li>RBI proposals summary (Taxmann): https://www.taxmann.com/post/blog/rbi-proposes-new-digital-payment-fraud-safeguards/</li>
+<li>Google AP2 explained (CloudNews): https://cloudnews.tech/google-launches-ap2-the-open-protocol-for-ai-agent-payments-how-it-works-who-supports-it-and-what-it-means-for-merchants-and-users/</li>
+<li>AP2 legal view (Loeb &amp; Loeb): https://www.loeb.com/en/insights/passle/2025/10/the-rise-of-agentic-commerce-what-googles-ap2-protocol-means-for-shopping-and-marketing</li>
+<li>Prompt injection in AI browsers (The Register): https://www.theregister.com/2025/10/28/ai_browsers_prompt_injection</li>
+<li>F-Secure, <em>Can AI shopping agents be trusted?</em>: https://www.f-secure.com/en/partners/insights/can-ai-shopping-agents-be-trusted-we-built-one-to-find-out</li>
+<li>PromptFix attacks on agentic browsers (OECD AI incidents): https://oecd.ai/en/incidents/2025-08-21-0e45</li>
+<li>Razorpay, Cashfree, BharatPe, PayU agentic suites (Windsor Drake): https://windsordrake.com/market-intelligence/product-launches/razorpay-cashfree-bharatpe-payu-product-launch-2026-09-25</li>
+<li>Razorpay Agent Studio (Bankers Adda): https://www.bankersadda.com/razorpay-launches-ai-agent-studio-to-automate-business-payments/</li>
+<li>Visa agentic commerce India launch (Windsor Drake): https://windsordrake.com/market-intelligence/product-launches/visa-product-launch-2026-09-11</li>
+<li>McKinsey agentic commerce forecast (Digital Commerce 360): https://www.digitalcommerce360.com/2025/10/20/mckinsey-forecast-5-trillion-agentic-commerce-sales-2030/</li>
+<li>Morgan Stanley agentic commerce forecast (Yahoo Finance): https://finance.yahoo.com/news/morgan-stanley-sees-multi-path-093502239.html</li>
+<li>India quick commerce 2026 (Digital in Asia): https://digitalinasia.com/india-quick-commerce-blinkit-zepto-instamart/</li>
+<li>DPDP Rules timeline (Sansa Legal): https://www.sansalegal.com/post/dpdp-act-2023-and-rules-2025-phased-implementation-timeline-and-business-compliance-deadlines</li>
+</ul>
+<nav class="pager" aria-label="Documents">
+  <span></span><span><a href="02_PRD.html">PRD →</a></span>
+</nav>
+<p class="foot">Rekha is a concept case study by Abhishek Kumar. Market facts are cited; sizing and targets are labelled assumptions.</p>
+</article>
+</main>
+</body>
+</html>

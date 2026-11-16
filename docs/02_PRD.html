@@ -1,0 +1,1396 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PRD · Rekha</title>
+<meta name="description" content="PRD: part of Rekha, a product case study on spending limits for AI agents on UPI, by Abhishek Kumar.">
+<meta property="og:title" content="PRD · Rekha">
+<meta property="og:image" content="https://whyabhiiiii.github.io/rekha-ai-agent-payments/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%235B3CC4'/%3E%3Cpath d='M12 42C24 26 40 22 52 24' fill='none' stroke='white' stroke-width='6' stroke-linecap='round'/%3E%3Ccircle cx='12' cy='42' r='5' fill='white'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&family=Rozha+One&display=swap">
+<style>
+/* Layout: a single reading column pinned to the same violet margin rule as the case study. */
+:root {
+  --paper: #F6F5FA; --surface: #FFFFFF; --ink: #17162B; --muted: #5D5B73; --faint: #6A6783; --rule: #E2E0EC;
+  --line: #5B3CC4; --line-ink: #4A2FB0; --line-soft: #EEEAFC;
+  --f-display: "Rozha One", "Noto Serif Devanagari", Georgia, serif;
+  --f-body: "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #121120; --surface: #1C1B2C; --ink: #ECEAF6; --muted: #A9A6C0; --faint: #908DA9; --rule: #2D2B42;
+    --line: #A792FF; --line-ink: #C4B6FF; --line-soft: #262046; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #121120; --surface: #1C1B2C; --ink: #ECEAF6; --muted: #A9A6C0; --faint: #908DA9; --rule: #2D2B42;
+  --line: #A792FF; --line-ink: #C4B6FF; --line-soft: #262046; color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 17px/1.65 var(--f-body); }
+a { color: var(--line-ink); text-underline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--line); outline-offset: 2px; }
+.top { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; justify-content: space-between;
+  padding: 14px max(16px, 4vw); border-bottom: 1px solid var(--rule); background: var(--paper); position: sticky; top: env(safe-area-inset-top, 0px); z-index: 2; }
+.mark { display: inline-flex; align-items: baseline; gap: 8px; text-decoration: none; color: var(--ink); }
+.mark .dev { font-family: var(--f-display); font-size: 26px; line-height: 1; border-bottom: 3px solid var(--line); }
+.mark .lat { font-family: var(--f-display); font-size: 18px; }
+.top nav { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 14.5px; font-weight: 600; }
+.top nav a { text-decoration: none; }
+.top nav a:hover { text-decoration: underline; }
+.wrap { max-width: 980px; margin: 0 auto; padding: 32px max(16px, 4vw) 64px; }
+article { border-left: 2px solid var(--line); padding-left: clamp(16px, 4vw, 40px); min-width: 0; }
+article > * { max-width: 72ch; }
+article > .tw, article > pre, article > .mermaid-wrap { max-width: none; }
+h1 { font-family: var(--f-display); font-weight: 400; font-size: clamp(32px, 5vw, 48px); line-height: 1.08; margin: 0 0 18px; text-wrap: balance; }
+h2 { font-family: var(--f-display); font-weight: 400; font-size: clamp(25px, 3.4vw, 32px); line-height: 1.15; margin: 44px 0 12px; text-wrap: balance; }
+h3 { font-size: 19px; margin: 28px 0 8px; }
+h4 { font-size: 16px; margin: 20px 0 6px; }
+p, li { margin: 0 0 12px; }
+ul, ol { padding-left: 22px; margin: 0 0 14px; }
+hr { border: 0; border-top: 1px solid var(--rule); margin: 32px 0; }
+blockquote { margin: 0 0 16px; padding: 10px 16px; border-left: 4px solid var(--line); background: var(--line-soft); border-radius: 0 12px 12px 0; }
+blockquote p:last-child { margin-bottom: 0; }
+code { font-family: var(--f-mono); font-size: .86em; background: var(--line-soft); color: var(--line-ink); padding: 1px 5px; border-radius: 5px; }
+pre { background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; padding: 14px 16px; overflow-x: auto; margin: 0 0 16px; }
+pre code { background: none; color: var(--ink); padding: 0; font-size: 13.5px; line-height: 1.55; }
+.tw { overflow-x: auto; border: 1px solid var(--rule); border-radius: 12px; background: var(--surface); margin: 0 0 18px; }
+table { width: 100%; border-collapse: collapse; font-size: 14.5px; min-width: 560px; }
+th { text-align: left; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; padding: 10px 12px; border-bottom: 1px solid var(--rule); }
+td { padding: 9px 12px; border-top: 1px solid var(--rule); vertical-align: top; }
+tr:first-child td { border-top: 0; }
+.mermaid-wrap { background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; padding: 16px; overflow-x: auto; margin: 0 0 18px; }
+pre.mermaid { border: 0; padding: 0; margin: 0; background: none; overflow: visible; }
+pre.mermaid svg { display: block; margin-inline: auto; }
+/* trees (opportunity tree, metric tree): nested lists drawn with connector lines */
+ul.tree { list-style: none; padding: 14px 16px; margin: 0 0 18px; max-width: none; background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; font-size: 15.5px; }
+ul.tree ul { list-style: none; margin: 8px 0 4px 6px; padding-left: 18px; border-left: 2px solid var(--line-soft); }
+ul.tree li { margin: 0 0 6px; line-height: 1.5; }
+ul.tree > li > ul > li { margin-bottom: 12px; }
+ul.tree em { color: var(--muted); font-size: .93em; }
+.pager { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 48px; padding-top: 18px; border-top: 1px solid var(--rule); font-weight: 600; }
+.foot { margin-top: 24px; font-size: 13.5px; color: var(--faint); }
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="mark" href="../index.html"><span class="dev" lang="hi">रेखा</span><span class="lat">Rekha</span></a>
+  <nav aria-label="Project">
+    <a href="../index.html">Case study</a>
+    <a href="../prototype.html">Prototype</a>
+    <a href="../index.html#docs">All documents</a>
+  </nav>
+</header>
+<main class="wrap">
+<article>
+<h1 id="02-prd-rekha-mvp">02 · PRD: Rekha MVP</h1>
+<div class="tw"><table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Product</strong></td>
+<td>Rekha: agent spending controls inside a UPI app</td>
+</tr>
+<tr>
+<td><strong>Author</strong></td>
+<td>Abhishek Kumar</td>
+</tr>
+<tr>
+<td><strong>Status</strong></td>
+<td>Draft v1.0, ready for review</td>
+</tr>
+<tr>
+<td><strong>Last updated</strong></td>
+<td>17 Nov 2026</td>
+</tr>
+<tr>
+<td><strong>Assumptions</strong></td>
+<td>An agent-delegation rail exists on UPI: NPCI's planned Unified Agent Protocol (launch reported paused, Sept 2026) or today's mandate-based agent payments (one-time mandates, Reserve Pay). Limits shown are UPI Circle's full-delegation caps, used as placeholders until agent limits are published.</td>
+</tr>
+<tr>
+<td><strong>Reviewers (intended)</strong></td>
+<td>Engineering lead, Design lead, Risk &amp; Fraud, Legal &amp; Compliance, Partnerships (agent platforms), PSP bank partner</td>
+</tr>
+<tr>
+<td><strong>Related</strong></td>
+<td><code>01_Discovery_and_Research.md</code> · <code>03_Metrics_and_Experiments.md</code> · <code>05_Trust_Safety_Threat_Model.md</code></td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2 id="tldr">TL;DR</h2>
+<p>Agents can already pay over UPI (Pine Labs P3P since June 2026; Razorpay × NPCI checkout pilots in ChatGPT and Claude), and NPCI has been preparing a Unified Agent Protocol to scale it (its launch was reported paused in September 2026, pending regulatory clearance). But users only get an amount cap. Rekha adds the missing layer: <strong>users draw boundaries ("Rekhas") in plain language, every agent payment is checked against what the user actually asked for, and anything outside the line is held for approval or stopped, with a clear reason and a one-tap way back.</strong></p>
+<p>MVP scope: connect an agent, create a Rekha (plain language or template), real-time decision engine (allow / ask / block), reason-first approvals, activity with explainable receipts, kill switch, Intent Lock, Injection Shield v1, weekly digest, and a basic "report a problem" flow that generates an evidence pack.</p>
+<p><strong>Success in the 12-week pilot:</strong> ≥ 35% of pilot users create a Rekha in week 1; ≥ 60% of agent payments complete without a step-up; dispute rate ≤ 0.3%; false-block rate ≤ 2%; added decision latency p95 &lt; 300 ms.</p>
+<hr>
+<h2 id="1-problem">1. Problem</h2>
+<p>See <code>01_Discovery_and_Research.md</code>. In short:</p>
+<ul>
+<li><strong>Trust gap:</strong> 74% are open to an agent doing shopping tasks for them; 9% are open to an agent buying on its own, even with guardrails they set (Accenture, 2026).</li>
+<li><strong>Rails are amount-only:</strong> UPI Circle full delegation caps at ₹15,000/month and ₹5,000/transaction, but can't express <em>what</em> or <em>from whom</em>.</li>
+<li><strong>Agents can be manipulated:</strong> prompt injection can make an agent pay the wrong merchant or buy the wrong thing while staying inside a cap.</li>
+<li><strong>No clear way back:</strong> liability for agent payments is unresolved (it is one of the reported reasons NPCI's launch is paused); users fear "the bank will say I authorised it".</li>
+</ul>
+<hr>
+<h2 id="2-goals-and-non-goals">2. Goals and non-goals</h2>
+<h3 id="goals-pilot">Goals (pilot)</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>Goal</th>
+<th>Measured by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G1</td>
+<td>Make delegation feel controllable</td>
+<td>% of pilot users with ≥ 1 active Rekha; "I feel in control" score ≥ 4.2/5</td>
+</tr>
+<tr>
+<td>G2</td>
+<td>Let agents complete routine payments without constant approvals</td>
+<td>% of agent payments auto-allowed (target ≥ 60% by week 8)</td>
+</tr>
+<tr>
+<td>G3</td>
+<td>Stop payments that don't match intent</td>
+<td>Recall on seeded red-team attacks ≥ 95%; confirmed agent-fraud losses = 0</td>
+</tr>
+<tr>
+<td>G4</td>
+<td>Don't get in the way of legitimate payments</td>
+<td>False-block rate ≤ 2%; payment success rate within 1 pp of non-agent UPI</td>
+</tr>
+<tr>
+<td>G5</td>
+<td>Make mistakes recoverable</td>
+<td>Median time from "report a problem" to evidence pack &lt; 10 s; dispute rate ≤ 0.3%</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="non-goals-mvp">Non-goals (MVP)</h3>
+<ul>
+<li><strong>Not an agent.</strong> Rekha never shops, browses or chooses products.</li>
+<li><strong>Not a new payment rail.</strong> We sit on the UPI agent rail: UAP when it launches, mandate-based agent payments until then. We never move money ourselves.</li>
+<li><strong>No raising rail limits.</strong> Rekha can only be <em>stricter</em> than NPCI/UPI caps, never looser.</li>
+<li><strong>No P2P payments by agents</strong> (sending money to individuals). This is a deliberate safety choice; most authorised-push-payment fraud lands in individual accounts.</li>
+<li><strong>No credit/BNPL funding</strong> in MVP (RuPay-credit-on-UPI is a later phase).</li>
+<li><strong>No merchant-facing product</strong> in MVP.</li>
+<li><strong>No ML risk model in MVP.</strong> Rules first, with shadow-mode data collection for a model in phase 2.</li>
+<li><strong>No standalone app.</strong> Rekha ships inside a partner UPI app (see <code>04_Strategy_and_GTM.md</code>).</li>
+</ul>
+<hr>
+<h2 id="3-concepts-and-glossary">3. Concepts and glossary</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Agent</strong></td>
+<td>AI software the user links to pay on their behalf. "Registered" means listed in NPCI's agent registry, once that exists.</td>
+</tr>
+<tr>
+<td><strong>Rekha</strong></td>
+<td>A boundary the user sets for an agent: purpose, merchants/categories, budget and period, exclusions, autonomy level, expiry</td>
+</tr>
+<tr>
+<td><strong>Intent</strong></td>
+<td>What the user asked the agent to do for a specific task ("reorder last week's groceries"). Submitted by the agent and checked against the Rekha.</td>
+</tr>
+<tr>
+<td><strong>Cart</strong></td>
+<td>What the agent is actually trying to buy: items, quantities, prices, merchant, payee UPI ID</td>
+</tr>
+<tr>
+<td><strong>Intent Lock</strong></td>
+<td>The check that the cart matches the intent and the Rekha</td>
+</tr>
+<tr>
+<td><strong>Injection Shield</strong></td>
+<td>Checks for signs the agent was manipulated: payee swaps, price anomalies, untrusted provenance, injection indicators</td>
+</tr>
+<tr>
+<td><strong>Decision</strong></td>
+<td>ALLOW, ASK (step-up approval), or BLOCK, always with reason codes</td>
+</tr>
+<tr>
+<td><strong>Autonomy level</strong></td>
+<td>L0 Ask every time · L1 Ask only when unusual · L2 Auto, notify after · L3 Auto, weekly digest only</td>
+</tr>
+<tr>
+<td><strong>Kill switch</strong></td>
+<td>One tap to pause every agent immediately</td>
+</tr>
+<tr>
+<td><strong>Evidence pack</strong></td>
+<td>Signed bundle of the Rekha, intent, cart, decision, reasons and timestamps for a dispute</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2 id="4-users-and-hero-scenarios">4. Users and hero scenarios</h2>
+<p>Primary user for MVP: <strong>Priya, the Delegator</strong> (urban, AI-native, frequent quick-commerce shopper). Guardians and cautious bill-payers come in Phase 2 via Family Rekha.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>Scenario</th>
+<th>Expected Rekha behaviour</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>H1</td>
+<td>Agent reorders weekly groceries, ₹1,840, from an allowed quick-commerce merchant</td>
+<td><strong>ALLOW</strong> silently (L1), receipt in activity</td>
+</tr>
+<tr>
+<td>H2</td>
+<td>Same order, but agent adds a ₹3,999 air fryer it saw as a "deal"</td>
+<td><strong>ASK</strong>: "This isn't groceries. Your agent added an air fryer (₹3,999)."</td>
+</tr>
+<tr>
+<td>H3</td>
+<td>A product page hides an instruction; agent tries to pay a new UPI ID not belonging to the merchant</td>
+<td><strong>BLOCK</strong>: "The payee doesn't match the merchant your agent was shopping at." User alerted.</td>
+</tr>
+<tr>
+<td>H4</td>
+<td>Agent pays the electricity bill, ₹2,310, to the usual biller</td>
+<td><strong>ALLOW</strong> (bill-pay Rekha, L2)</td>
+</tr>
+<tr>
+<td>H5</td>
+<td>Agent tries to send ₹4,500 to an individual "for the refund"</td>
+<td><strong>BLOCK</strong>: agent payments to individuals are off</td>
+</tr>
+<tr>
+<td>H6</td>
+<td>Agent orders 12 kg of onions instead of 1.2 kg</td>
+<td><strong>ASK</strong>: quantity is 10× your usual</td>
+</tr>
+<tr>
+<td>H7</td>
+<td>Phone stolen / agent account compromised</td>
+<td>User or guardian hits <strong>kill switch</strong> on another device or by calling support; all agents pause</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2 id="5-prioritisation">5. Prioritisation</h2>
+<h3 id="rice-pilot-of-50000-users-one-quarter">RICE (pilot of 50,000 users, one quarter)</h3>
+<p>Impact scale: 3 = massive, 2 = high, 1 = medium, 0.5 = low. Effort in person-months.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Rank</th>
+<th>Feature</th>
+<th>Reach</th>
+<th>Impact</th>
+<th>Confidence</th>
+<th>Effort</th>
+<th><strong>RICE</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Kill switch</td>
+<td>50,000</td>
+<td>1</td>
+<td>90%</td>
+<td>0.5</td>
+<td><strong>90,000</strong></td>
+</tr>
+<tr>
+<td>2</td>
+<td>Reason-first step-up approvals</td>
+<td>45,000</td>
+<td>2</td>
+<td>80%</td>
+<td>2</td>
+<td><strong>36,000</strong></td>
+</tr>
+<tr>
+<td>3</td>
+<td>Activity feed + explainable receipts</td>
+<td>50,000</td>
+<td>1</td>
+<td>90%</td>
+<td>1.5</td>
+<td><strong>30,000</strong></td>
+</tr>
+<tr>
+<td>4</td>
+<td>Plain-language Rekha builder + templates</td>
+<td>50,000</td>
+<td>2</td>
+<td>80%</td>
+<td>3</td>
+<td><strong>26,667</strong></td>
+</tr>
+<tr>
+<td>5</td>
+<td>Intent Lock</td>
+<td>50,000</td>
+<td>3</td>
+<td>70%</td>
+<td>4</td>
+<td><strong>26,250</strong></td>
+</tr>
+<tr>
+<td>6</td>
+<td>Weekly agent digest</td>
+<td>50,000</td>
+<td>0.5</td>
+<td>80%</td>
+<td>1</td>
+<td><strong>20,000</strong></td>
+</tr>
+<tr>
+<td>7</td>
+<td>Injection Shield v1 (rules)</td>
+<td>50,000</td>
+<td>3</td>
+<td>50%</td>
+<td>5</td>
+<td><strong>15,000</strong></td>
+</tr>
+<tr>
+<td>7</td>
+<td>Trust Ramp</td>
+<td>30,000</td>
+<td>2</td>
+<td>50%</td>
+<td>2</td>
+<td><strong>15,000</strong></td>
+</tr>
+<tr>
+<td>9</td>
+<td>Verified-agent badge (registry)</td>
+<td>50,000</td>
+<td>1</td>
+<td>50%</td>
+<td>3</td>
+<td><strong>8,333</strong></td>
+</tr>
+<tr>
+<td>10</td>
+<td>Family Rekha (guardian mode)</td>
+<td>8,000</td>
+<td>3</td>
+<td>60%</td>
+<td>5</td>
+<td><strong>2,880</strong></td>
+</tr>
+<tr>
+<td>11</td>
+<td>One-tap dispute + evidence pack</td>
+<td>5,000</td>
+<td>2</td>
+<td>60%</td>
+<td>4</td>
+<td><strong>1,500</strong></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="where-i-overrode-the-score-and-why">Where I overrode the score, and why</h3>
+<ol>
+<li><strong>Injection Shield goes into the MVP despite ranking 7th.</strong> RICE measures expected value; it doesn't capture tail risk. One public story ("AI agent tricked into paying a scammer through UPI") would set back trust for the whole category and could get the pilot paused by the partner bank. Safety is a <strong>launch gate</strong>, not a backlog item.</li>
+<li><strong>A "report a problem" flow with an evidence pack goes in (lite version) despite ranking last.</strong> The PSP bank partner needs a dispute trail before agreeing to the pilot. It's a <strong>dependency for launch</strong>, not a feature competing for users.</li>
+<li><strong>Trust Ramp moves to P1 despite tying with Injection Shield.</strong> It needs a few weeks of clean-payment history per user before it can trigger anyway, so building it in month 1 is wasted effort.</li>
+<li><strong>Verified-agent badge waits</strong> for the NPCI registry API to be available to apps (open dependency).</li>
+</ol>
+<h3 id="kano-classification">Kano classification</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Must-be (expected; absence = anger)</th>
+<th>Performance (more = better)</th>
+<th>Attractive (delighters)</th>
+<th>Reverse (some dislike)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Kill switch, spend caps, receipts, a dispute path</td>
+<td>Fewer approval pings, faster decisions, parser accuracy</td>
+<td>"Why did my agent buy this?", weekly digest with savings, Trust Ramp, Family Rekha</td>
+<td>Cooling windows: keep them short and explain them</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="mvp-scope-moscow">MVP scope (MoSCoW)</h3>
+<ul>
+<li><strong>Must:</strong> connect agent, create Rekha (NL + templates), decision engine, Intent Lock, Injection Shield v1, step-up approvals, activity + receipts, kill switch, report-a-problem (lite), audit log</li>
+<li><strong>Should:</strong> weekly digest, Hinglish input</li>
+<li><strong>Could:</strong> Trust Ramp (P1), verified badge (P1), Hindi (Devanagari) input (P1)</li>
+<li><strong>Won't (this release):</strong> Family Rekha (P2), credit-funded payments, merchant product, ML risk model</li>
+</ul>
+<hr>
+<h2 id="6-how-a-payment-flows">6. How a payment flows</h2>
+<div class="mermaid-wrap"><pre class="mermaid">sequenceDiagram
+  autonumber
+  actor U as User
+  participant A as AI agent
+  participant M as Merchant
+  participant P as UPI app / PSP
+  participant R as Rekha decision engine
+  U-&gt;&gt;A: &quot;Reorder my weekly groceries&quot;
+  A-&gt;&gt;P: Task intent (linked to the user's Rekha)
+  P-&gt;&gt;R: Check intent fits the Rekha
+  R--&gt;&gt;P: OK (intent id)
+  A-&gt;&gt;M: Build cart
+  A-&gt;&gt;P: Payment request: cart, payee UPI ID, amount, discovery trace, intent id
+  P-&gt;&gt;R: Decide (target p95 &lt; 300 ms)
+  alt ALLOW
+    R--&gt;&gt;P: ALLOW + reason codes
+    P-&gt;&gt;M: Pay via delegated UPI rail
+    P--&gt;&gt;U: Receipt in activity (or digest at L3)
+  else ASK
+    R--&gt;&gt;P: ASK + reasons
+    P--&gt;&gt;U: Approval card (reason first)
+    U-&gt;&gt;P: Approve with UPI PIN / biometric, or reject
+  else BLOCK
+    R--&gt;&gt;P: BLOCK + reasons
+    P--&gt;&gt;A: Declined with reason code
+    P--&gt;&gt;U: Alert (if safety-related)
+  end
+</pre></div>
+<hr>
+<h2 id="7-functional-requirements">7. Functional requirements</h2>
+<p>Priority: <strong>P0</strong> = MVP, <strong>P1</strong> = within pilot, <strong>P2</strong> = after pilot.</p>
+<h3 id="epic-1-connect-an-agent-p0">Epic 1: Connect an agent (P0)</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>User story</th>
+<th>Acceptance criteria</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.1</td>
+<td>As a user, I want to link an AI agent to my UPI app so it can pay for me within limits I set</td>
+<td><strong>Given</strong> an agent requests linking through the UPI agent rail, <strong>when</strong> I open the request in my UPI app, <strong>then</strong> I see the agent name, developer, registry status and requested permissions, and I can approve with my UPI PIN or decline</td>
+</tr>
+<tr>
+<td>1.2</td>
+<td>As a user, I want to know if an agent is registered with NPCI</td>
+<td><strong>Given</strong> the registry confirms the agent, <strong>then</strong> a "Registered agent" label shows. <strong>Given</strong> registry lookup fails, <strong>then</strong> the agent is treated as unregistered: linking is allowed only at L0</td>
+</tr>
+<tr>
+<td>1.3</td>
+<td>As a user, I want linking to create a safe starter Rekha so I'm protected immediately</td>
+<td><strong>When</strong> linking completes, <strong>then</strong> a starter Rekha is created: ₹1,000/week, L0 (ask every time), no P2P, expires in 30 days, and I'm prompted to set up my own</td>
+</tr>
+<tr>
+<td>1.4</td>
+<td>As a user, I want to unlink an agent at any time</td>
+<td><strong>When</strong> I unlink, <strong>then</strong> all its Rekhas are revoked immediately, in-flight payments not yet submitted to UPI are blocked, and consent withdrawal is logged (DPDP)</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="epic-2-create-a-rekha-p0">Epic 2: Create a Rekha (P0)</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>User story</th>
+<th>Acceptance criteria</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2.1</td>
+<td>As a user, I want to describe the limit in my own words</td>
+<td><strong>Given</strong> I type "weekly groceries up to ₹2,500 from Blinkit or BigBasket, no alcohol", <strong>then</strong> I see a structured card within 2 s: purpose=Groceries; merchants=2; budget ₹2,500/week; excludes=Alcohol; autonomy=L1</td>
+</tr>
+<tr>
+<td>2.2</td>
+<td>As a user, I want to confirm the structured version before it's saved</td>
+<td><strong>Then</strong> nothing is saved until I tap "Save Rekha" and enter my UPI PIN. Every field is editable.</td>
+</tr>
+<tr>
+<td>2.3</td>
+<td>As a user, I want to be asked when my instruction is ambiguous</td>
+<td><strong>Given</strong> "buy whatever I need", <strong>then</strong> the builder asks for budget and category instead of guessing. <strong>Given</strong> no amount, <strong>then</strong> it proposes ₹1,000/week and highlights it as a default</td>
+</tr>
+<tr>
+<td>2.4</td>
+<td>As a user, I want templates for common jobs</td>
+<td><strong>Then</strong> templates exist for: Weekly groceries, Bills &amp; recharges, Medicine refills, Travel tickets, Subscriptions</td>
+</tr>
+<tr>
+<td>2.5</td>
+<td>As a user, I can't create a Rekha looser than the rail allows</td>
+<td><strong>Given</strong> I ask for ₹20,000/month, <strong>then</strong> the builder caps it at the rail limit (today: UPI Circle's ₹15,000/month and ₹5,000/payment) and tells me why</td>
+</tr>
+<tr>
+<td>2.6</td>
+<td>As a user, I want to type in Hinglish (P0) and Hindi (P1)</td>
+<td>"har hafte 2000 tak grocery, daaru nahi" parses to the same card as the English equivalent</td>
+</tr>
+<tr>
+<td>2.7</td>
+<td>As a user, I want Rekhas to expire</td>
+<td>Every Rekha has an expiry (default 90 days); I get a reminder 7 days before</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="epic-3-decision-engine-p0">Epic 3: Decision engine (P0)</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Requirement</th>
+<th>Acceptance criteria</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3.1</td>
+<td>Every agent payment request gets a decision: ALLOW, ASK or BLOCK</td>
+<td>100% of requests get a decision plus ≥ 1 reason code; p95 latency &lt; 300 ms, p99 &lt; 600 ms</td>
+</tr>
+<tr>
+<td>3.2</td>
+<td>Hard rules produce BLOCK; soft rules produce ASK</td>
+<td>See rule table in §8</td>
+</tr>
+<tr>
+<td>3.3</td>
+<td>Decisions are deterministic and replayable</td>
+<td>Same inputs give the same decision; every decision is written to the audit log with inputs, rule versions and output</td>
+</tr>
+<tr>
+<td>3.4</td>
+<td>Idempotent</td>
+<td>A retried request with the same idempotency key returns the original decision and never double-charges</td>
+</tr>
+<tr>
+<td>3.5</td>
+<td>Rekha can only tighten, never loosen, rail limits</td>
+<td>Any request above the rail's limits is BLOCKed regardless of the Rekha</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="epic-4-step-up-approvals-p0">Epic 4: Step-up approvals (P0)</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>User story</th>
+<th>Acceptance criteria</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4.1</td>
+<td>As a user, I want to understand in one glance why I'm being asked</td>
+<td>The card leads with the reason ("Not groceries: air fryer, ₹3,999"), then agent, merchant, amount, and a cart diff vs my intent</td>
+</tr>
+<tr>
+<td>4.2</td>
+<td>As a user, I want rejecting to be as easy as approving</td>
+<td>Approve and Reject are equal size; Reject needs no PIN; Approve needs UPI PIN or device biometric</td>
+</tr>
+<tr>
+<td>4.3</td>
+<td>As a user, I want approvals only inside my UPI app</td>
+<td>Approvals are never sent as SMS links; push notifications open the in-app card</td>
+</tr>
+<tr>
+<td>4.4</td>
+<td>As a user, I want pending approvals to expire safely</td>
+<td>Unanswered approvals expire after 15 minutes as "not approved"; the agent is told</td>
+</tr>
+<tr>
+<td>4.5</td>
+<td>As a user, I want to approve just the allowed part</td>
+<td><strong>Given</strong> a cart with in-Rekha and out-of-Rekha items, <strong>then</strong> I can "Pay for groceries only" and the agent gets a partial approval (P1)</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="epic-5-activity-and-explainable-receipts-p0">Epic 5: Activity and explainable receipts (P0)</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>User story</th>
+<th>Acceptance criteria</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>5.1</td>
+<td>As a user, I want one feed of everything every agent did</td>
+<td>Feed shows payments, asks and blocks across all agents, filterable by agent and Rekha</td>
+</tr>
+<tr>
+<td>5.2</td>
+<td>As a user, I want to know why my agent bought this</td>
+<td>Each receipt shows: my intent → the cart → which checks passed → decision. Plain language, no codes</td>
+</tr>
+<tr>
+<td>5.3</td>
+<td>As a user, I want to see how much of each Rekha is left</td>
+<td>Each Rekha shows spent vs budget for the current period, in IST</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="epic-6-kill-switch-p0">Epic 6: Kill switch (P0)</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>User story</th>
+<th>Acceptance criteria</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>6.1</td>
+<td>As a user, I want to stop every agent in one tap</td>
+<td>One tap plus confirmation pauses all agents within 2 s; pending approvals are rejected; agents are notified</td>
+</tr>
+<tr>
+<td>6.2</td>
+<td>As a user, I want to resume safely</td>
+<td>Resuming needs UPI PIN; agents resume at their previous autonomy level, or L0 if I choose "resume carefully"</td>
+</tr>
+<tr>
+<td>6.3</td>
+<td>As a user without my phone</td>
+<td>Kill switch is also available through the partner app's support line and web login (P1)</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="epic-7-report-a-problem-evidence-pack-p0-lite-full-in-p1">Epic 7: Report a problem / evidence pack (P0-lite, full in P1)</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>User story</th>
+<th>Acceptance criteria</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>7.1</td>
+<td>As a user, I want to report a wrong agent payment from its receipt</td>
+<td>"Report a problem" is on every receipt; choosing a reason generates an evidence pack in &lt; 10 s</td>
+</tr>
+<tr>
+<td>7.2</td>
+<td>As a bank dispute team, I need a tamper-evident record</td>
+<td>The evidence pack contains the Rekha version, intent, cart, payee, decision, reason codes and timestamps, and is signed and hash-chained to the audit log</td>
+</tr>
+<tr>
+<td>7.3</td>
+<td>As a user, I want to track the dispute (P1)</td>
+<td>Status updates in the receipt: Raised → With bank → Resolved</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="epic-8-weekly-agent-digest-p0-should">Epic 8: Weekly agent digest (P0 "should")</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>User story</th>
+<th>Acceptance criteria</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>8.1</td>
+<td>As a user, I want a weekly summary</td>
+<td>Every Sunday 7 pm IST: spent per agent and Rekha, number of asks and blocks, top reasons, and anything that needs attention</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="epic-9-trust-ramp-p1">Epic 9: Trust Ramp (P1)</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>User story</th>
+<th>Acceptance criteria</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>9.1</td>
+<td>As a user, I want the app to suggest more autonomy once an agent has earned it</td>
+<td><strong>Given</strong> an agent has made ≥ 5 payments under a Rekha at L0 with zero rejects or disputes, <strong>then</strong> I'm offered L1 with a summary of its track record. Never auto-upgraded without my consent.</td>
+</tr>
+<tr>
+<td>9.2</td>
+<td>As a user, I want autonomy to drop automatically if something goes wrong</td>
+<td>Any BLOCK for a safety reason drops that agent to L0 for 7 days and tells me why</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="epic-10-family-rekha-p2">Epic 10: Family Rekha (P2)</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>User story</th>
+<th>Acceptance criteria</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10.1</td>
+<td>As a guardian, I want to co-approve my parent's agent payments above a threshold</td>
+<td>Payments above the guardian threshold (default ₹2,000) need the guardian's approval as well as the parent's</td>
+</tr>
+<tr>
+<td>10.2</td>
+<td>As a parent, I want my guardian to see my agents' activity</td>
+<td>Guardian sees a read-only activity feed; the parent can revoke guardian access at any time</td>
+</tr>
+<tr>
+<td>10.3</td>
+<td>As a guardian, I want to use the kill switch for my parent</td>
+<td>Guardian can pause the parent's agents; resume needs the parent's PIN</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2 id="8-decision-engine-specification">8. Decision engine specification</h2>
+<p>Checks run on every payment request. <strong>Any BLOCK → BLOCK. Otherwise any ASK → ASK. Otherwise ALLOW</strong> (then the autonomy level decides how the user is notified). All triggered reasons are returned, so the explanation is complete.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Check</th>
+<th>Result</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R01</td>
+<td>Agent unknown (never linked) or registry status revoked</td>
+<td>BLOCK</td>
+<td>NPCI registry, cached ≤ 24 h. Linked-but-unregistered agents may run only at L0 (R00).</td>
+</tr>
+<tr>
+<td>R02</td>
+<td>Agent paused by user</td>
+<td>BLOCK</td>
+<td></td>
+</tr>
+<tr>
+<td>R03</td>
+<td>Kill switch on</td>
+<td>BLOCK</td>
+<td></td>
+</tr>
+<tr>
+<td>R04</td>
+<td>No active Rekha for this agent and purpose</td>
+<td>BLOCK</td>
+<td></td>
+</tr>
+<tr>
+<td>R05</td>
+<td>Payee is an individual (P2P)</td>
+<td>BLOCK</td>
+<td>Unless the Rekha names that contact (P2)</td>
+</tr>
+<tr>
+<td>R06</td>
+<td>Merchant or category outside the Rekha</td>
+<td>BLOCK</td>
+<td>Merchant category from the PSP's merchant data</td>
+</tr>
+<tr>
+<td>R07</td>
+<td>Cart contains an excluded item (e.g. alcohol, tobacco)</td>
+<td>BLOCK</td>
+<td>Catalog category of each line item</td>
+</tr>
+<tr>
+<td>R08</td>
+<td>Amount above the Rekha's per-payment limit</td>
+<td>ASK</td>
+<td></td>
+</tr>
+<tr>
+<td>R09</td>
+<td>Period spend + amount above the Rekha budget</td>
+<td>ASK</td>
+<td>Period in IST</td>
+</tr>
+<tr>
+<td>R10</td>
+<td>Above the rail's hard caps</td>
+<td>BLOCK</td>
+<td>Placeholder: UPI Circle's full-delegation caps (₹5,000/payment, ₹15,000/month) until agent limits are published</td>
+</tr>
+<tr>
+<td>R11</td>
+<td>Intent Lock: cart doesn't match the intent (score &lt; 0.60)</td>
+<td>ASK</td>
+<td>Category rules + semantic similarity (signal only)</td>
+</tr>
+<tr>
+<td>R12</td>
+<td>Quantity ≥ 3× the user's usual for that item</td>
+<td>ASK</td>
+<td>Uses 8-week history; skipped if no history</td>
+</tr>
+<tr>
+<td>R13</td>
+<td>Unit price ≥ 1.5× the reference median</td>
+<td>ASK</td>
+<td>Reference from merchant catalog / recent prices</td>
+</tr>
+<tr>
+<td>R14</td>
+<td><strong>Payee mismatch:</strong> payee UPI ID isn't the registered UPI ID of the merchant in the discovery trace</td>
+<td>BLOCK</td>
+<td>Strongest prompt-injection signal</td>
+</tr>
+<tr>
+<td>R15</td>
+<td>First-time payee and amount &gt; ₹2,000</td>
+<td>ASK + 30-min cooling window</td>
+<td>Mirrors RBI's proposed cooling-off idea</td>
+</tr>
+<tr>
+<td>R16</td>
+<td>Velocity: &gt; 5 agent payments in 10 min, or &gt; 15/day</td>
+<td>ASK</td>
+<td></td>
+</tr>
+<tr>
+<td>R17</td>
+<td>Injection indicators reported by the agent runtime (hidden instructions, instruction-like text in page content)</td>
+<td>ASK (BLOCK if combined with R13 or R14)</td>
+<td>Depends on agent platform signals</td>
+</tr>
+<tr>
+<td>R18</td>
+<td>Repeat: the same payee and amount, or an overlapping cart (≥ 60% of the same items, any shop), was already paid in the last 24 h by this or any other agent</td>
+<td>ASK</td>
+<td>Catches a bill paid twice and two agents doing the same job. The cross-agent view is unique to the user side.</td>
+</tr>
+<tr>
+<td>R00</td>
+<td>Autonomy level L0</td>
+<td>ASK</td>
+<td>"Ask every time"</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Worked example (scenario H3):</strong> payee <code>quickdeals.refund@okxyz</code> ≠ merchant's registered UPI ID → <strong>R14 BLOCK</strong>; also first-time payee for ₹4,200 → R15 ASK. Final: <strong>BLOCK</strong>, reasons R14 + R15. User sees: <em>"Stopped. The payee doesn't match the store your agent was shopping at. This is a common sign of a manipulated agent. No money left your account."</em></p>
+<hr>
+<h2 id="9-ai-components-and-evaluation-plan">9. AI components and evaluation plan</h2>
+<p><strong>Principle: models suggest, rules decide.</strong> AI is used where language is fuzzy; deterministic rules make every money decision. No LLM is on the payment hot path.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Where AI is used</th>
+<th>What decides</th>
+<th>Hot path?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Plain-language Rekha builder</td>
+<td>LLM turns text into a draft policy</td>
+<td><strong>User confirms</strong> the structured card; a validator enforces caps</td>
+<td>No (setup time)</td>
+</tr>
+<tr>
+<td>Intent Lock similarity</td>
+<td>Embedding similarity between intent and cart items</td>
+<td>One signal in R11; category rules dominate</td>
+<td>Yes, but a small embedding model with cached embeddings (&lt; 20 ms)</td>
+</tr>
+<tr>
+<td>Explanations</td>
+<td>Templates keyed by reason code; LLM used offline only to draft translations</td>
+<td>Templates</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Risk model (Phase 2)</td>
+<td>Gradient-boosted model trained on shadow-mode labels</td>
+<td>Adds a risk score to the rules; can only escalate (ALLOW → ASK), never relax</td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="eval-plan-plain-language-rekha-builder">Eval plan: plain-language Rekha builder</h3>
+<ul>
+<li><strong>Golden set:</strong> 600 utterances: 40% English, 30% Hinglish (Roman script), 20% Hindi (Devanagari), 10% adversarial or ambiguous ("no limit", "whatever's cheapest", "₹2.5k", "dhai hazaar").</li>
+<li><strong>Labelling:</strong> two annotators per item; disagreements resolved by a third; target Cohen's κ ≥ 0.8.</li>
+<li><strong>Field metrics and release thresholds:</strong></li>
+</ul>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Metric</th>
+<th>Threshold</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Amount</td>
+<td>Exact match</td>
+<td>≥ 98%</td>
+</tr>
+<tr>
+<td>Period</td>
+<td>Exact match</td>
+<td>≥ 97%</td>
+</tr>
+<tr>
+<td>Merchants</td>
+<td>F1</td>
+<td>≥ 95%</td>
+</tr>
+<tr>
+<td>Categories</td>
+<td>F1</td>
+<td>≥ 93%</td>
+</tr>
+<tr>
+<td>Exclusions</td>
+<td>Recall</td>
+<td>≥ 97%</td>
+</tr>
+<tr>
+<td><strong>Looser-than-intended rate</strong> (policy allows more than the user said)</td>
+<td>Rate</td>
+<td><strong>≤ 0.5%</strong> (safety-critical)</td>
+</tr>
+<tr>
+<td>Tighter-than-intended rate</td>
+<td>Rate</td>
+<td>≤ 5% (annoying, not dangerous)</td>
+</tr>
+<tr>
+<td>Asks a follow-up when it should</td>
+<td>Recall on the ambiguous subset</td>
+<td>≥ 90%</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li><strong>Asymmetric error budget:</strong> looser errors are treated as safety incidents; tighter errors are UX debt. This tells the team where to spend tuning effort.</li>
+<li><strong>Deterministic guards after the model:</strong> amounts in the policy must appear in the user's text (or be the highlighted default); policy must be within rail caps; unknown merchants are dropped and flagged.</li>
+<li><strong>LLM-as-judge</strong> is used only for regression tests, after it agrees with human labels ≥ 90% on a calibration set.</li>
+<li><strong>Regression gate:</strong> the full suite runs on every prompt or model change; a release is blocked if any threshold regresses.</li>
+</ul>
+<h3 id="eval-plan-intent-lock">Eval plan: Intent Lock</h3>
+<ul>
+<li>2,000 labelled (intent, cart) pairs from shadow mode, including 300 seeded mismatches and 100 red-team cases from <code>05_Trust_Safety_Threat_Model.md</code>.</li>
+<li>Target: recall on mismatches ≥ 95% at a false-ASK rate ≤ 3%. Threshold (0.60) tuned on the validation split, reported on the held-out split.</li>
+</ul>
+<hr>
+<h2 id="10-non-functional-requirements">10. Non-functional requirements</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Requirement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Latency</td>
+<td>Decision p95 &lt; 300 ms, p99 &lt; 600 ms end-to-end inside the PSP call; must not reduce UPI success rate by &gt; 1 pp</td>
+</tr>
+<tr>
+<td>Availability</td>
+<td>99.95% monthly. <strong>Failure mode:</strong> if Rekha is unreachable, fail <em>closed</em> for new payees and amounts &gt; ₹1,000 (ASK); fall back to the rail's own limits plus notification for known billers ≤ ₹1,000</td>
+</tr>
+<tr>
+<td>Security</td>
+<td>Agent requests signed with the agent's registered key; device binding for approvals; Rekha changes only in-app with UPI PIN, never through an agent; approvals never via SMS links</td>
+</tr>
+<tr>
+<td>Audit</td>
+<td>Append-only, hash-chained decision log; retained for the dispute window plus regulatory minimum; replayable</td>
+</tr>
+<tr>
+<td>Privacy (DPDP)</td>
+<td>Notice and consent at agent linking; purpose limitation (payment control only); data minimisation (store line items 90 days, then aggregates only); no agent browsing history stored beyond the payment's discovery trace; consent withdrawal = unlink + deletion of non-required data</td>
+</tr>
+<tr>
+<td>Accessibility</td>
+<td>WCAG 2.2 AA; screen-reader labels; 48 dp tap targets; decisions never shown by colour alone</td>
+</tr>
+<tr>
+<td>Localisation</td>
+<td>English + Hinglish in MVP; Hindi (Devanagari) in P1; all amounts in ₹ with Indian digit grouping (₹1,50,000)</td>
+</tr>
+<tr>
+<td>Device</td>
+<td>Works on 2 GB RAM Android; module adds &lt; 2 MB to the app</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2 id="11-system-architecture">11. System architecture</h2>
+<div class="mermaid-wrap"><pre class="mermaid">flowchart TB
+  AG[AI agent platform] --&gt;|intent, cart, trace| RAIL[UPI agent rail&lt;br/&gt;UAP planned · mandates today]
+  RAIL --&gt; PSP[PSP bank]
+  PSP --&gt;|decide| API[Rekha decision API]
+  API --&gt;|ALLOW / ASK / BLOCK| PSP
+  PSP --&gt;|only if allowed or approved| SW[UPI switch]
+  SW --&gt; M[Merchant]
+  subgraph APP[Partner UPI app]
+    API --&gt; DE[Decision engine&lt;br/&gt;rules R00 to R18]
+    DE --&gt; PE[Policy store&lt;br/&gt;Rekhas, versions]
+    DE --&gt; SIG[Signals&lt;br/&gt;prices · history · merchant UPI IDs]
+    DE --&gt; LOG[(Audit log&lt;br/&gt;append-only, hash-chained)]
+    DE --&gt; NOTIF[Notifications&lt;br/&gt;push · digest]
+    NOTIF --&gt; UI[Rekha screens&lt;br/&gt;builder · approvals · activity · kill switch]
+    UI --&gt; PE
+    UI --&gt; NL[Plain-language parser&lt;br/&gt;LLM, setup only]
+  end
+  RAIL -. registry lookup .-&gt; DE
+</pre></div>
+<h3 id="key-entities">Key entities</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Entity</th>
+<th>Key fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Agent</td>
+<td>agent_id, registry_status, developer, public_key, linked_at, autonomy_level, paused</td>
+</tr>
+<tr>
+<td>Rekha</td>
+<td>rekha_id, agent_id, purpose, merchants[], categories[], exclusions[], per_payment_limit, budget, period, autonomy_level, expires_at, version</td>
+</tr>
+<tr>
+<td>Intent</td>
+<td>intent_id, rekha_id, text, structured, created_at</td>
+</tr>
+<tr>
+<td>PaymentRequest</td>
+<td>request_id, idempotency_key, intent_id, merchant_id, payee_upi_id, amount, cart[], trace[]</td>
+</tr>
+<tr>
+<td>Decision</td>
+<td>request_id, decision, reason_codes[], rule_versions, latency_ms, created_at</td>
+</tr>
+<tr>
+<td>Approval</td>
+<td>request_id, shown_at, resolved_at, outcome (approve / reject / expire)</td>
+</tr>
+<tr>
+<td>Dispute</td>
+<td>dispute_id, request_id, reason, evidence_pack_hash, status</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2 id="12-edge-cases">12. Edge cases</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Case</th>
+<th>Behaviour</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Item out of stock; agent substitutes</td>
+<td>Rekha setting "Allow same-category substitutes up to +10% price" (default on for groceries); otherwise ASK</td>
+</tr>
+<tr>
+<td>Price changes between cart and payment</td>
+<td>Re-check at payment; ≤ +5% allowed, otherwise ASK</td>
+</tr>
+<tr>
+<td>Agent retries after a BLOCK</td>
+<td>Same idempotency key returns the same decision; new key counts toward velocity (R16)</td>
+</tr>
+<tr>
+<td>Approval pending and user offline</td>
+<td>Expires after 15 min as "not approved"; agent informed; nothing charged</td>
+</tr>
+<tr>
+<td>The same order or bill arrives twice within 24 h (from one agent or two)</td>
+<td>R18 repeat check → ASK</td>
+</tr>
+<tr>
+<td>Budget period boundary</td>
+<td>Periods computed in IST; weekly resets Monday 00:00</td>
+</tr>
+<tr>
+<td>Festive bundles not in the reference catalog</td>
+<td>Intent Lock may under-match; mitigation in the RCA playbook (<code>03</code>)</td>
+</tr>
+<tr>
+<td>Merchant changes its UPI ID legitimately</td>
+<td>Merchant registry update; first payments to the new ID are ASK</td>
+</tr>
+<tr>
+<td>User unlinks agent mid-payment</td>
+<td>Payments not yet submitted to UPI are blocked; submitted ones complete and appear in activity</td>
+</tr>
+<tr>
+<td>Kill switch pressed while approvals pending</td>
+<td>All pending rejected; agents notified</td>
+</tr>
+<tr>
+<td>Rail cap exhausted (₹15,000 for the month)</td>
+<td>BLOCK with a clear message; Rekha cannot raise it</td>
+</tr>
+<tr>
+<td>Registry lookup times out</td>
+<td>Use cache ≤ 24 h for known agents; treat unknown as unregistered (L0 only)</td>
+</tr>
+<tr>
+<td>Amount written as words or shorthand ("dhai hazaar", "2.5k")</td>
+<td>Parser normalises; validator confirms against text; highlighted in the confirm card</td>
+</tr>
+<tr>
+<td>Partial refund from merchant</td>
+<td>Shown in activity; restores budget for the period</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2 id="13-instrumentation">13. Instrumentation</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Event</th>
+<th>Key properties</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent_linked</code></td>
+<td>agent_id, registry_status, source</td>
+</tr>
+<tr>
+<td><code>rekha_created</code></td>
+<td>source (nl / template / form), time_to_create_s, fields_edited, language</td>
+</tr>
+<tr>
+<td><code>rekha_parse_result</code></td>
+<td>parse_ms, ambiguous_flag, user_edits (diff vs draft)</td>
+</tr>
+<tr>
+<td><code>payment_decision</code></td>
+<td>decision, reason_codes[], latency_ms, autonomy_level, amount_bucket</td>
+</tr>
+<tr>
+<td><code>stepup_shown</code> / <code>stepup_resolved</code></td>
+<td>reason_codes[], outcome, time_to_decide_s</td>
+</tr>
+<tr>
+<td><code>kill_switch_toggled</code></td>
+<td>on/off, source (app / support / guardian)</td>
+</tr>
+<tr>
+<td><code>problem_reported</code></td>
+<td>reason, evidence_pack_ms</td>
+</tr>
+<tr>
+<td><code>digest_opened</code></td>
+<td>week, items_flagged</td>
+</tr>
+<tr>
+<td><code>trust_ramp_offered</code> / <code>trust_ramp_accepted</code></td>
+<td>agent_id, clean_payment_count</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2 id="14-release-plan">14. Release plan</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Who</th>
+<th>What's on</th>
+<th>Exit criteria</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>0. Shadow mode</strong> (4 weeks)</td>
+<td>All agent-payment traffic at the partner (mandate-based agents today, UAP once live)</td>
+<td>Engine runs and logs decisions but enforces nothing</td>
+<td>Would-be false-block rate ≤ 3% on manual review of 1,000 samples; p95 &lt; 300 ms</td>
+</tr>
+<tr>
+<td><strong>1. Closed beta</strong> (4 weeks)</td>
+<td>5,000 users (employees + invited AI-heavy users)</td>
+<td>Enforcement on; L0 and L1 only</td>
+<td>Dispute rate ≤ 0.3%; no safety incident; CSAT ≥ 4/5</td>
+</tr>
+<tr>
+<td><strong>2. Pilot</strong> (12 weeks)</td>
+<td>50,000 users in Bengaluru, Delhi NCR, Mumbai</td>
+<td>L2 on; Trust Ramp experiment; weekly digest</td>
+<td>Pilot goals in §2</td>
+</tr>
+<tr>
+<td><strong>3. General availability</strong></td>
+<td>1% → 10% → 50% → 100% of agent-linked users</td>
+<td>Everything in MVP + P1</td>
+<td>Guardrails hold at each step for 7 days</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Rollback triggers (any one):</strong> false-block rate &gt; 5% for 3 consecutive days · p95 latency &gt; 500 ms for 1 hour · UPI success rate down &gt; 1 pp vs control · any confirmed loss caused by an incorrect ALLOW above ₹10,000 in aggregate per week.</p>
+<hr>
+<h2 id="15-dependencies-open-questions-decisions">15. Dependencies, open questions, decisions</h2>
+<h3 id="dependencies">Dependencies</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Dependency</th>
+<th>Owner</th>
+<th>Risk</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UAP access and agent registry API</td>
+<td>NPCI / PSP partner</td>
+<td>High: launch reported paused pending regulatory clearance, no public timeline. Fallback: mandate-based agent payments through the PSP.</td>
+</tr>
+<tr>
+<td>PSP bank decision hook in the payment path</td>
+<td>PSP partner</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td>Agent platforms sending intent + discovery trace</td>
+<td>Agent partners</td>
+<td>High: fallback is Rekha-only checks</td>
+</tr>
+<tr>
+<td>Merchant registered UPI IDs and catalog categories</td>
+<td>PSP / payment gateways</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td>Legal review of liability language</td>
+<td>Legal</td>
+<td>Medium</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="open-questions">Open questions</h3>
+<ol>
+<li><strong>Liability:</strong> when Rekha allows a payment that turns out wrong, who bears the loss? Depends on the liability rules NPCI and RBI settle on. Our evidence pack is designed to make that decision fast whatever the rule is.</li>
+<li>Will agent platforms pass per-task intent, or only the cart? (Rekha still works with cart + Rekha only, with weaker Intent Lock.)</li>
+<li>Can Reserve Pay be split into per-Rekha envelopes, or only one block per user?</li>
+<li>Should guardians in Family Rekha count as RBI's proposed "trusted person"?</li>
+</ol>
+<h3 id="decision-log">Decision log</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>Decision</th>
+<th>Why</th>
+<th>Alternatives rejected</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>D1</td>
+<td>No LLM in the payment decision</td>
+<td>Latency, determinism, auditability</td>
+<td>LLM judge on every payment (slow, non-replayable)</td>
+</tr>
+<tr>
+<td>D2</td>
+<td>Every new agent starts at L0 on a small starter Rekha. When the user sets up their own Rekha, the suggested level is L1 for registered agents. Unregistered agents stay at L0.</td>
+<td>A short L0 start is safe and bounded; staying at L0 causes approval fatigue; L2 is too much trust on day 1</td>
+<td>One fixed level for everyone</td>
+</tr>
+<tr>
+<td>D3</td>
+<td>Agent P2P payments blocked by default</td>
+<td>Push-payment fraud mostly lands in individual accounts</td>
+<td>Allow with ASK (still exploitable through social engineering)</td>
+</tr>
+<tr>
+<td>D4</td>
+<td>Fail closed for new payees on outage</td>
+<td>A missed grocery order is cheaper than a fraud loss</td>
+<td>Fail open (unsafe) or fail closed for everything (breaks bill pay)</td>
+</tr>
+<tr>
+<td>D5</td>
+<td>Template explanations, not generated</td>
+<td>Consistency, translation quality, legal review</td>
+<td>LLM-generated explanations</td>
+</tr>
+<tr>
+<td>D6</td>
+<td>Ship inside a partner UPI app</td>
+<td>Distribution, PIN/consent already there, zero-MDR economics (<code>04</code>)</td>
+<td>Standalone app (needs a TPAP licence, no distribution)</td>
+</tr>
+</tbody>
+</table></div>
+<nav class="pager" aria-label="Documents">
+  <span><a href="01_Discovery_and_Research.html">← Discovery &amp; Research</a></span><span><a href="03_Metrics_and_Experiments.html">Metrics &amp; Experiments →</a></span>
+</nav>
+<p class="foot">Rekha is a concept case study by Abhishek Kumar. Market facts are cited; sizing and targets are labelled assumptions.</p>
+</article>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
+<script>
+  (function () {
+    if (!window.mermaid) return;
+    var root = document.documentElement;
+    var dark = root.getAttribute("data-theme") === "dark" ||
+      (!root.getAttribute("data-theme") && window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches);
+    mermaid.initialize({ startOnLoad: false, theme: dark ? "dark" : "neutral", securityLevel: "strict" });
+    function fit() {
+      document.querySelectorAll("pre.mermaid svg").forEach(function (svg) {
+        var natural = svg.viewBox.baseVal.width, room = svg.closest(".mermaid-wrap").clientWidth - 34;
+        var width = Math.min(natural, Math.max(room, natural * 0.68));
+        svg.style.maxWidth = "none"; svg.style.width = width + "px"; svg.style.height = "auto";
+      });
+    }
+    mermaid.run({ querySelector: "pre.mermaid" }).then(function () { fit(); window.addEventListener("resize", fit); });
+  })();
+</script>
+</body>
+</html>

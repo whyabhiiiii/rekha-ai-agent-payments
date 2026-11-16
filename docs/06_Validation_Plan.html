@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Validation Plan · Rekha</title>
+<meta name="description" content="Validation Plan: part of Rekha, a product case study on spending limits for AI agents on UPI, by Abhishek Kumar.">
+<meta property="og:title" content="Validation Plan · Rekha">
+<meta property="og:image" content="https://whyabhiiiii.github.io/rekha-ai-agent-payments/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%235B3CC4'/%3E%3Cpath d='M12 42C24 26 40 22 52 24' fill='none' stroke='white' stroke-width='6' stroke-linecap='round'/%3E%3Ccircle cx='12' cy='42' r='5' fill='white'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&family=Rozha+One&display=swap">
+<style>
+/* Layout: a single reading column pinned to the same violet margin rule as the case study. */
+:root {
+  --paper: #F6F5FA; --surface: #FFFFFF; --ink: #17162B; --muted: #5D5B73; --faint: #6A6783; --rule: #E2E0EC;
+  --line: #5B3CC4; --line-ink: #4A2FB0; --line-soft: #EEEAFC;
+  --f-display: "Rozha One", "Noto Serif Devanagari", Georgia, serif;
+  --f-body: "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #121120; --surface: #1C1B2C; --ink: #ECEAF6; --muted: #A9A6C0; --faint: #908DA9; --rule: #2D2B42;
+    --line: #A792FF; --line-ink: #C4B6FF; --line-soft: #262046; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #121120; --surface: #1C1B2C; --ink: #ECEAF6; --muted: #A9A6C0; --faint: #908DA9; --rule: #2D2B42;
+  --line: #A792FF; --line-ink: #C4B6FF; --line-soft: #262046; color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 17px/1.65 var(--f-body); }
+a { color: var(--line-ink); text-underline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--line); outline-offset: 2px; }
+.top { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; justify-content: space-between;
+  padding: 14px max(16px, 4vw); border-bottom: 1px solid var(--rule); background: var(--paper); position: sticky; top: env(safe-area-inset-top, 0px); z-index: 2; }
+.mark { display: inline-flex; align-items: baseline; gap: 8px; text-decoration: none; color: var(--ink); }
+.mark .dev { font-family: var(--f-display); font-size: 26px; line-height: 1; border-bottom: 3px solid var(--line); }
+.mark .lat { font-family: var(--f-display); font-size: 18px; }
+.top nav { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 14.5px; font-weight: 600; }
+.top nav a { text-decoration: none; }
+.top nav a:hover { text-decoration: underline; }
+.wrap { max-width: 980px; margin: 0 auto; padding: 32px max(16px, 4vw) 64px; }
+article { border-left: 2px solid var(--line); padding-left: clamp(16px, 4vw, 40px); min-width: 0; }
+article > * { max-width: 72ch; }
+article > .tw, article > pre, article > .mermaid-wrap { max-width: none; }
+h1 { font-family: var(--f-display); font-weight: 400; font-size: clamp(32px, 5vw, 48px); line-height: 1.08; margin: 0 0 18px; text-wrap: balance; }
+h2 { font-family: var(--f-display); font-weight: 400; font-size: clamp(25px, 3.4vw, 32px); line-height: 1.15; margin: 44px 0 12px; text-wrap: balance; }
+h3 { font-size: 19px; margin: 28px 0 8px; }
+h4 { font-size: 16px; margin: 20px 0 6px; }
+p, li { margin: 0 0 12px; }
+ul, ol { padding-left: 22px; margin: 0 0 14px; }
+hr { border: 0; border-top: 1px solid var(--rule); margin: 32px 0; }
+blockquote { margin: 0 0 16px; padding: 10px 16px; border-left: 4px solid var(--line); background: var(--line-soft); border-radius: 0 12px 12px 0; }
+blockquote p:last-child { margin-bottom: 0; }
+code { font-family: var(--f-mono); font-size: .86em; background: var(--line-soft); color: var(--line-ink); padding: 1px 5px; border-radius: 5px; }
+pre { background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; padding: 14px 16px; overflow-x: auto; margin: 0 0 16px; }
+pre code { background: none; color: var(--ink); padding: 0; font-size: 13.5px; line-height: 1.55; }
+.tw { overflow-x: auto; border: 1px solid var(--rule); border-radius: 12px; background: var(--surface); margin: 0 0 18px; }
+table { width: 100%; border-collapse: collapse; font-size: 14.5px; min-width: 560px; }
+th { text-align: left; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; padding: 10px 12px; border-bottom: 1px solid var(--rule); }
+td { padding: 9px 12px; border-top: 1px solid var(--rule); vertical-align: top; }
+tr:first-child td { border-top: 0; }
+.mermaid-wrap { background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; padding: 16px; overflow-x: auto; margin: 0 0 18px; }
+pre.mermaid { border: 0; padding: 0; margin: 0; background: none; overflow: visible; }
+pre.mermaid svg { display: block; margin-inline: auto; }
+/* trees (opportunity tree, metric tree): nested lists drawn with connector lines */
+ul.tree { list-style: none; padding: 14px 16px; margin: 0 0 18px; max-width: none; background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; font-size: 15.5px; }
+ul.tree ul { list-style: none; margin: 8px 0 4px 6px; padding-left: 18px; border-left: 2px solid var(--line-soft); }
+ul.tree li { margin: 0 0 6px; line-height: 1.5; }
+ul.tree > li > ul > li { margin-bottom: 12px; }
+ul.tree em { color: var(--muted); font-size: .93em; }
+.pager { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 48px; padding-top: 18px; border-top: 1px solid var(--rule); font-weight: 600; }
+.foot { margin-top: 24px; font-size: 13.5px; color: var(--faint); }
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="mark" href="../index.html"><span class="dev" lang="hi">रेखा</span><span class="lat">Rekha</span></a>
+  <nav aria-label="Project">
+    <a href="../index.html">Case study</a>
+    <a href="../prototype.html">Prototype</a>
+    <a href="../index.html#docs">All documents</a>
+  </nav>
+</header>
+<main class="wrap">
+<article>
+<h1 id="06-validation-plan">06 · Validation Plan</h1>
+<p><strong>Status: not yet run.</strong> This is my plan for testing Rekha's riskiest assumptions with real users before any build decision. The results will replace the <strong>[Hypothesis]</strong> labels in <code>01_Discovery_and_Research.md</code> and go into the case study.</p>
+<p><strong>Why it matters for this project in particular.</strong> Accenture found that only 9% of consumers are open to an agent buying on its own, even with guardrails they set themselves. So I can't assume that controls create trust. The survey and the usability tests below are built to check whether <em>specific, visible</em> controls change what people say and do.</p>
+<hr>
+<h2 id="1-what-were-testing">1. What we're testing</h2>
+<p>The riskiest assumptions from <code>01_Discovery_and_Research.md</code> §8:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>Assumption</th>
+<th>Method</th>
+<th>Pass signal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A1</td>
+<td>AI-assistant users want agents to pay for routine purchases</td>
+<td>Survey + interviews</td>
+<td>≥ 30% of AI users would delegate ≥ 1 category with controls</td>
+</tr>
+<tr>
+<td>A2</td>
+<td>Fear of mistakes/fraud is the main blocker</td>
+<td>Interviews</td>
+<td>≥ 5 of 8 cite control or safety unprompted</td>
+</tr>
+<tr>
+<td>A3</td>
+<td>Users can set up a Rekha in &lt; 90 s</td>
+<td>Usability test</td>
+<td>≥ 80% success; median &lt; 90 s</td>
+</tr>
+<tr>
+<td>A4</td>
+<td>Users read step-up reasons and decide correctly</td>
+<td>Usability test (seeded bad payment)</td>
+<td>≥ 90% reject the seeded attack</td>
+</tr>
+<tr>
+<td>A6</td>
+<td>Fintech teams see strategic value</td>
+<td>Expert interviews</td>
+<td>≥ 2 of 3 say they'd prioritise it in 2027</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2 id="2-two-week-plan">2. Two-week plan</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Day</th>
+<th>Task</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Post screener (§3) in college groups, LinkedIn, alumni network, X/Twitter</td>
+<td>30+ screener responses</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Launch survey (§5); publish fake-door page (§6)</td>
+<td>Live links</td>
+</tr>
+<tr>
+<td>3–6</td>
+<td>8 user interviews, 30 min each (§4)</td>
+<td>Notes per interview</td>
+</tr>
+<tr>
+<td>5–8</td>
+<td>3 expert interviews (§4.2): fintech PM, payments/risk person, agent developer</td>
+<td>Notes</td>
+</tr>
+<tr>
+<td>7–9</td>
+<td>5–6 usability tests with the prototype (§7)</td>
+<td>Task metrics + quotes</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Close survey (target n ≥ 150); pull fake-door numbers</td>
+<td>Charts</td>
+</tr>
+<tr>
+<td>11–12</td>
+<td>Affinity map and synthesis (§8)</td>
+<td>5–7 insight cards</td>
+</tr>
+<tr>
+<td>13–14</td>
+<td>Update the case study and docs with what I learned</td>
+<td>v2 case study</td>
+</tr>
+</tbody>
+</table></div>
+<hr>
+<h2 id="3-screener">3. Screener</h2>
+<ol>
+<li>How often do you use an AI assistant (ChatGPT, Gemini, Claude, Perplexity, Copilot, Meta AI…)?
+   <em>Daily / A few times a week / A few times a month / Rarely / Never</em></li>
+<li>In the last month, how many times did you order groceries or essentials online (Blinkit, Zepto, Instamart, BigBasket, Flipkart Minutes, etc.)?
+   <em>0 / 1–3 / 4–8 / 9+</em></li>
+<li>How many bills or recharges do you pay through UPI in a typical month?
+   <em>0 / 1–2 / 3–5 / 6+</em></li>
+<li>Have you ever let an app or a person pay for something on your behalf (AutoPay, UPI Circle, a family member, an assistant)? <em>Yes / No</em></li>
+<li>Age band, city, occupation.</li>
+<li>Are you OK with a 30-minute video call? <em>Yes / No</em></li>
+</ol>
+<p><strong>Select:</strong> daily or weekly AI users with ≥ 4 online grocery orders/month (Delegators); plus 2–3 people aged 45+ or people who manage a parent's payments (Cautious bill-payers / Guardians). <strong>Exclude:</strong> people working on agent payments (they go in the expert track).</p>
+<hr>
+<h2 id="4-interview-scripts">4. Interview scripts</h2>
+<h3 id="41-user-interview-30-minutes-mom-test-style">4.1 User interview (30 minutes, Mom Test style)</h3>
+<p><strong>Rules:</strong> ask about <strong>past behaviour</strong>, not hypotheticals. Don't pitch Rekha until the last 5 minutes. Don't ask "would you use…?". Silence is fine; let them fill it.</p>
+<p><strong>Intro (2 min)</strong></p>
+<blockquote>
+<p>"Thanks for this. I'm researching how people use AI assistants and how they handle routine payments. There are no right answers, and I'm not selling anything. Is it OK if I take notes? [If recording: Is it OK if I record, only for my notes?]"</p>
+</blockquote>
+<p><strong>Routine spending (6 min)</strong>
+1. Walk me through the last time you ordered groceries online. What triggered it? How long did it take?
+2. Which bills or recharges did you pay last month? How do you remember them?
+3. What's the most annoying routine payment you make? Why?</p>
+<p><strong>AI usage (6 min)</strong>
+4. Tell me about the last thing you asked an AI assistant to help with.
+5. Have you ever had an assistant help with shopping: comparing products, building a list, finding deals? What happened next? Who actually paid?
+6. <em>(If they stopped before paying)</em> What made you take over at that point?</p>
+<p><strong>Delegation and trust (8 min)</strong>
+7. Tell me about a time someone else paid for something on your behalf (family member, AutoPay, assistant). How did you set it up? Did anything go wrong?
+8. Has a payment ever gone wrong for you: wrong amount, scam attempt, double charge? What did you do? How long did it take to fix?
+9. If something you didn't intend got paid, what would you do first?</p>
+<p><strong>Concept reaction (5 min, only now)</strong>
+10. Show the prototype's home screen and one ASK screen. "What do you think this does?" (Don't explain. Watch.)
+11. "What would you want to control if an assistant paid for your groceries?"
+12. "What would make you <em>not</em> use this?"</p>
+<p><strong>Close (3 min)</strong>
+13. "Is there anything I should have asked but didn't?"
+14. "Who else should I talk to about this?" (Referrals grow the sample.)</p>
+<p><strong>Note template (fill right after each call)</strong></p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Participant (ID, segment, age band, city)</td>
+<td></td>
+</tr>
+<tr>
+<td>Current behaviour (facts only)</td>
+<td></td>
+</tr>
+<tr>
+<td>Pains (with direct quotes)</td>
+<td></td>
+</tr>
+<tr>
+<td>Workarounds</td>
+<td></td>
+</tr>
+<tr>
+<td>Fears / blockers about agents paying</td>
+<td></td>
+</tr>
+<tr>
+<td>Reaction to concept (what they understood unprompted)</td>
+<td></td>
+</tr>
+<tr>
+<td>Surprises</td>
+<td></td>
+</tr>
+<tr>
+<td>Evidence for/against A1, A2</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="42-expert-interview-30-minutes">4.2 Expert interview (30 minutes)</h3>
+<p>For: a PM at a UPI app, payment gateway or bank; someone in risk/fraud; an agent developer.</p>
+<ol>
+<li>What's your team doing about agent-initiated payments in the next 12 months?</li>
+<li>What worries you most about agents paying through your rails or app?</li>
+<li>How do you handle disputes today for delegated payments (UPI Circle, AutoPay)? Where does it break?</li>
+<li><em>(Agent developers)</em> What payment information can your agent share at checkout: task intent, cart, sources it visited? What would stop you sharing it?</li>
+<li><em>(Risk)</em> Which signals would you trust most to catch a manipulated agent?</li>
+<li>Show the decision-rules table (PRD §8). "What's missing? What's wrong?"</li>
+<li>"If you had this, would it make your 2027 roadmap? What would have to be true?"</li>
+</ol>
+<p><strong>Cold message for expert interviews (LinkedIn, ≤ 300 characters)</strong></p>
+<blockquote>
+<p>"Hi [Name], I'm a final-year engineering student researching how UPI apps should handle AI-agent payments. I've built a concept and a decision-rules draft. Could I get 20 minutes of your feedback? Happy to share everything I've learned."</p>
+</blockquote>
+<hr>
+<h2 id="5-survey-target-n-150-google-forms-tally">5. Survey (target n ≥ 150; Google Forms / Tally)</h2>
+<p><strong>Intro:</strong> "5-minute anonymous survey on AI assistants and routine payments. No personal data beyond age band and city."</p>
+<ol>
+<li>How often do you use an AI assistant? <em>(Daily / Weekly / Monthly / Rarely / Never)</em> → if Never, skip to 13</li>
+<li>Which do you use? <em>(multi-select)</em></li>
+<li>Have you used an assistant to help with shopping in the last 3 months? <em>(Yes / No)</em></li>
+<li>For which of these would you let an AI assistant <strong>choose and pay</strong>, within limits you set? <em>(multi-select: Groceries / Bills &amp; recharges / Medicine refills / Train &amp; bus tickets / Subscriptions / Food delivery / None)</em></li>
+<li>For those, roughly how much do you spend per month? <em>(&lt; ₹1,000 / ₹1,000–3,000 / ₹3,000–6,000 / ₹6,000–10,000 / &gt; ₹10,000)</em></li>
+<li>What worries you most about an assistant paying for you? <em>(rank top 3: Wrong item or quantity / Overspending / Being scammed or tricked / Can't undo / Privacy / Don't know what it's doing / Other)</em></li>
+<li>Which controls would you want? <em>(multi-select: Monthly budget / Per-purchase limit / Only certain apps or shops / Ask me before unusual purchases / See why it bought something / Pause all agents instantly / Family member can see or approve)</em></li>
+<li>How would you prefer to approve? <em>(Ask every time / Ask only if unusual / Don't ask, just tell me after / Weekly summary only)</em></li>
+<li>Would you accept a 30-minute wait on the first payment to a new shop above ₹2,000 if it reduced fraud? <em>(Yes / Only for bigger amounts / No)</em></li>
+<li>If your agent's payment went wrong, who would you contact first? <em>(UPI app / Bank / The agent app / The shop / I'd give up)</em></li>
+<li>How much would you trust an assistant to pay if you had these controls? <em>(1–5)</em></li>
+<li>Without them? <em>(1–5)</em></li>
+<li>Do you manage digital payments for a parent or older relative? <em>(Yes / No)</em></li>
+<li>Age band; city tier; occupation.</li>
+<li>Want to try the prototype? <em>(optional contact)</em></li>
+</ol>
+<p><strong>Analysis plan:</strong> % choosing ≥ 1 category in Q4 among AI users (tests A1); Q6 ranking (A2); Q11 vs Q12 paired difference (trust lift from controls; a paired t-test or Wilcoxon signed-rank); Q8 distribution (validates the autonomy ladder); Q9 (A8). Q11 against Q12 is the direct test of the thesis: does naming specific controls move stated trust, when a general promise of guardrails did not?</p>
+<hr>
+<h2 id="6-fake-door-test">6. Fake-door test</h2>
+<p>A one-page site (Carrd, Framer or Notion) with:</p>
+<blockquote>
+<p><strong>Draw the line for your AI agents.</strong>
+Let your assistant pay for groceries and bills, but only what you said, only where you said, and stop it in one tap.
+<strong>[ Get early access ]</strong></p>
+</blockquote>
+<p>Clicking leads to: <em>"Thanks! Rekha is a concept I'm researching. It isn't live yet. Would you answer 3 quick questions?"</em> (then link to the survey). <strong>Be transparent; never collect payment details.</strong></p>
+<p>Drive traffic from the same places as the screener and one LinkedIn post. <strong>Metric:</strong> click-through on "Get early access" among unique visitors. <strong>Signal:</strong> ≥ 8% is strong for a cold concept page; &lt; 3% means the message or the need is weak.</p>
+<hr>
+<h2 id="7-usability-test-plan-prototype">7. Usability test plan (prototype)</h2>
+<p><strong>Participants:</strong> 5–6 from the screener (4 Delegators, 1–2 Guardians or 45+).
+<strong>Setup:</strong> open <code>prototype.html</code> on their phone or screen share; think-aloud.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Task</th>
+<th>Success criteria</th>
+<th>Measure</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T1. "Your agent should handle weekly groceries, up to ₹2,500, only from two apps, no alcohol. Set that up."</td>
+<td>Saved Rekha matches all 4 constraints</td>
+<td>Success, time, errors</td>
+</tr>
+<tr>
+<td>T2. "Your agent is asking you something. Decide what to do." (Air-fryer ASK)</td>
+<td>Rejects or approves groceries only; can say why</td>
+<td>Success, explanation in own words</td>
+</tr>
+<tr>
+<td>T3. "Something looks wrong. Stop all your agents."</td>
+<td>Finds and uses kill switch</td>
+<td>Time to find</td>
+</tr>
+<tr>
+<td>T4. "Find out why your agent's last payment was blocked."</td>
+<td>Explains payee mismatch in own words</td>
+<td>Comprehension</td>
+</tr>
+<tr>
+<td>T5. "How much of your grocery budget is left this week?"</td>
+<td>Correct number</td>
+<td>Success</td>
+</tr>
+</tbody>
+</table></div>
+<p>After each task: <strong>Single Ease Question</strong> (1–7, "How easy was that?"). At the end: the 3-item <strong>Trust Index</strong> from <code>03_Metrics_and_Experiments.md</code>.</p>
+<p><strong>Report format:</strong> a table of task × participant (✓ / ~ / ✗), median times, SEQ averages, the top 5 usability issues ranked by severity × frequency, and quotes.</p>
+<hr>
+<h2 id="8-synthesis-and-updating-the-case-study">8. Synthesis and updating the case study</h2>
+<ol>
+<li><strong>Affinity map:</strong> one sticky per observation (fact or quote) → cluster → name each cluster as an insight.</li>
+<li><strong>Insight card format:</strong> <em>We observed [behaviour] in [n of N] participants. This suggests [interpretation]. So we will [decision].</em></li>
+<li><strong>Evidence ladder:</strong> label each claim as Anecdote (1 person) → Pattern (≥ 3 of 8) → Quantified (survey) → Behavioural (fake door, usability).</li>
+<li><strong>Update the docs:</strong>
+   - Replace each <strong>[Hypothesis]</strong> in <code>01</code> with the result: confirmed, changed or dropped.
+   - Add a "What I learned" section to the case study with 3–5 insight cards and real numbers.
+   - Update the RICE confidence values in the PRD.
+   - <strong>If the research kills an assumption, it stays in the write-up,</strong> along with what changed because of it.</li>
+</ol>
+<hr>
+<h2 id="9-ethics">9. Ethics</h2>
+<ul>
+<li>Get consent before recording; anonymise names in all write-ups.</li>
+<li>Never ask for UPI IDs, account numbers or real transaction screenshots.</li>
+<li>Fake-door visitors are told it's a concept immediately after clicking.</li>
+<li>Offer to share the findings with everyone who helped.</li>
+</ul>
+<nav class="pager" aria-label="Documents">
+  <span><a href="05_Trust_Safety_Threat_Model.html">← Threat Model</a></span><span></span>
+</nav>
+<p class="foot">Rekha is a concept case study by Abhishek Kumar. Market facts are cited; sizing and targets are labelled assumptions.</p>
+</article>
+</main>
+</body>
+</html>
